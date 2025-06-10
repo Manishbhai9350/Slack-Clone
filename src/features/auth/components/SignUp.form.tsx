@@ -22,12 +22,13 @@ interface SignUpProps {
 }
 
 const SignUpForm = ({ setForm }: SignUpProps) => {
+  const [Name, setName] = useState("");
   const [Email, setEmail] = useState("");
   const [Password, setPassword] = useState("");
   const [ConfirmPassword, setConfirmPassword] = useState("");
   const [IsLoading, setIsLoading] = useState<boolean>(false);
   const [Error, setError] = useState("");
-  const [TimeOutId, setTimeOutId] = useState(null);
+  const [TimeOutId, setTimeOutId] = useState();
 
   const { signIn } = useAuthActions();
 
@@ -43,7 +44,7 @@ const SignUpForm = ({ setForm }: SignUpProps) => {
       return 
     }
     setIsLoading(true);
-    signIn("password", { email: Email, password: Password, flow: "signUp" })
+    signIn("password", { email: Email, password: Password, name:Name, flow: "signUp" })
       .catch((e) => {
         setError("Invalid Email or Password");
       })
@@ -75,6 +76,14 @@ const SignUpForm = ({ setForm }: SignUpProps) => {
       )}
       <CardContent className="space-y-5 px-0">
         <form onSubmit={HandleCredentials} className="space-y-2">
+          <Input
+            type="text"
+            placeholder="Enter Fullname"
+            value={Name}
+            onChange={(e) => setName(e.target.value)}
+            disabled={IsLoading}
+            required
+          />
           <Input
             type="email"
             placeholder="Enter Email"
