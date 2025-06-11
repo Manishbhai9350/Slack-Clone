@@ -1,22 +1,27 @@
-'use client'
-import { Button } from "@/components/ui/button";
+"use client";
+import { useEffect, useMemo } from "react";
 import UserAvatar from "@/features/auth/components/UserAvatar";
-import { useUser } from "@/features/auth/api/auth.user";
-import { useAuthActions } from "@convex-dev/auth/react";
+import { useWorkspaces } from "@/features/workspace/api/useWorkspaces";
+import { useWorkspaceAtom } from "@/features/workspace/hooks/useWorkSpace";
+
+
 export default function Home() {
-  const {signOut} = useAuthActions()
+  const { Data, IsLoading } = useWorkspaces();
+  const [open, setOpen] = useWorkspaceAtom();
 
-  const {user,isLoading} = useUser()
 
-  if(isLoading) return <>
-    <p>Loading...</p>
-  </>
+  const WorkSpaceId = useMemo(() => Data?.[0]?._id,[Data])
 
-  const {name,email} = user;
+  useEffect(() => {
+    if(!WorkSpaceId) {
+      setOpen(true)
+    }
+  }, [WorkSpaceId])
   
+
   return (
     <main className="h-screen w-full p-8">
-      <UserAvatar name={name} email={email} image={user?.image || ''} />
+      <UserAvatar />
     </main>
-  )
+  );
 }
