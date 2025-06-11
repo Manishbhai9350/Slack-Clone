@@ -13,6 +13,8 @@ import { FormEvent, useEffect, useState } from "react";
 import { useWorkspaceAtom } from "../hooks/useWorkSpace";
 import { useCreateWorkSpace } from "../api/creatWorkspace";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner"
+
 
 const WorkSpacePopup = () => {
   const [open, setOpen] = useWorkspaceAtom();
@@ -35,6 +37,7 @@ const WorkSpacePopup = () => {
       { name: Name },
       {
         onSuccess: (workspaceId) => {
+          toast.success('Workspace Created')
           setOpen(false)
           router.push(`/workspaces/${workspaceId}`);
         },

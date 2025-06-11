@@ -1,8 +1,15 @@
+import type { Metadata } from "next";
+
+import "./globals.css";
+
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
 import { ConvexClientProvider } from "@/components/Providers/convex.provider";
-import type { Metadata } from "next";
-import "./globals.css";
+
 import Modals from "@/components/Modals";
+
+import { Toaster } from "@/components/ui/sonner"
+ 
+
 
 export const metadata: Metadata = {
   title: "Slack Clone",
@@ -19,6 +26,7 @@ export default function RootLayout({
       <html lang="en">
         <body>
           <ConvexClientProvider>
+            <Toaster position="top-center" />
             <Modals />
             {children}
           </ConvexClientProvider>
