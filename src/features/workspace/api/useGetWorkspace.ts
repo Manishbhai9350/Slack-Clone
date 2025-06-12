@@ -6,7 +6,7 @@ import { useMemo } from "react"
 
 
 interface GetWorkspaceProps {
-    workspace:Id<'workspaces'>
+    workspaceId:Id<'workspaces'>
 }
 
 

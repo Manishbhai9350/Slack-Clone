@@ -1,20 +1,9 @@
 import WorkSpacePage from "@/features/workspace/componenets/workspace.page"
-import { Id } from "../../../../convex/_generated/dataModel";
 
-
-interface WorkspaceProps {
-  params:{
-    workspaceId:Id<'workspaces'>
-  }
-}
-
-
-const Workspace = async ({params}:WorkspaceProps) => {
-  const {workspaceId} = await params;
-  if(!workspaceId) return null;
+const Workspace = () => {
   return (
     <>
-      <WorkSpacePage workspaceId={workspaceId} />
+      <WorkSpacePage />
     </>
   )
 }

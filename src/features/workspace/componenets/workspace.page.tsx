@@ -1,13 +1,10 @@
 'use client'
 import { useGetWorkSpace } from '../api/useGetWorkspace'
-import { Id } from '../../../../convex/_generated/dataModel'
+import { useGetWorkspaceId } from '../hooks/useGetWorkspaceId'
 
 
-interface WorkSpaceProps {
-    workspaceId:Id<'workspaces'>
-}
-
-const WorkSpacePage = ({workspaceId}:WorkSpaceProps) => {
+const WorkSpacePage = () => {
+  const workspaceId = useGetWorkspaceId();
   const {Data,IsLoading} = useGetWorkSpace({workspaceId})
 
   if(IsLoading) {
