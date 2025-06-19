@@ -13,7 +13,7 @@ const WorkspaceLayout = ({children}:workspaceLayoutProps) => {
   return (
     <>
         <WorkspaceNav />
-        <div style={{height:innerHeight-60}} className="workspace-layout w-full  bg-red-400 flex">
+        <div className="workspace-layout w-full h-[calc(100vh-60px)]  bg-red-400 flex">
             <WorkspaceSidebar />
             {children}
         </div>

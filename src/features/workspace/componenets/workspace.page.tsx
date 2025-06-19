@@ -1,4 +1,5 @@
 'use client'
+import WorkspacePanel from '@/app/workspaces/[workspaceId]/_components/WorkspaceResiable';
 import { useGetWorkSpace } from '../api/useGetWorkspace'
 import { useGetWorkspaceId } from '../hooks/useGetWorkspaceId'
 
@@ -6,6 +7,7 @@ import { useGetWorkspaceId } from '../hooks/useGetWorkspaceId'
 const WorkSpacePage = () => {
   const workspaceId = useGetWorkspaceId();
   const {Data,IsLoading} = useGetWorkSpace({workspaceId})
+
 
   if(IsLoading) {
     return <p>Loading....</p>
@@ -15,17 +17,11 @@ const WorkSpacePage = () => {
     return <p>Unable To Find Workspace</p>
   }
 
-  console.log(Data)
   
   const date = new Date(Data?._creationTime)
 
   return (
-    <div>
-      <h1>Name: {Data?.name}</h1>
-      <h2>JoinCode: {Data?.joinCode}</h2>
-      <h2>Creation Time: {date.getSeconds()%60 }/{date.getMinutes()%60}/{date.getHours()%12}</h2>
-      <h2>Creation Date: {date.getDate()}/{date.getMonth()}/{date.getFullYear()}</h2>
-    </div>
+    <WorkspacePanel />
   )
 }
 

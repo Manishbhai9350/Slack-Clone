@@ -20,6 +20,8 @@ export default convexAuthNextjsMiddleware(async (request,{convexAuth}) => {
   if(IsAuthenticated && IsAuthPage(request)) {
   return nextjsMiddlewareRedirect(request,'/')
   }
+
+  return;
 })
 
 

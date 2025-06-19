@@ -12,9 +12,13 @@ export default function Home() {
 
   const WorkSpaceId = useMemo(() => Data?.[0]?._id,[Data])
 
+  console.log(Data)
+
   useEffect(() => {
     if(!WorkSpaceId) {
       setOpen(true)
+    } else {
+      setOpen(false)
     }
   }, [WorkSpaceId])
   

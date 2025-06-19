@@ -117,7 +117,7 @@ const LoginForm = ({setForm}:LoginProps) => {
             </div>
           </CardContent>
           <CardFooter className="p-0 m-0">
-            <p>Don&spon;t have an account ?&nbsp;</p> <span onClick={e => setForm('signup')} className="text-blue-300 hover:text-blue-500 cursor-pointer">Signup</span>
+            <p>Don&apos;t have an account ?&nbsp;</p> <span onClick={e => setForm('signup')} className="text-blue-300 hover:text-blue-500 cursor-pointer">Signup</span>
           </CardFooter>
         </Card>
   );

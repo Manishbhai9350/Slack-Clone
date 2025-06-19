@@ -6,32 +6,32 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuthActions } from "@convex-dev/auth/react";
-import { LogOut } from "lucide-react";
+import { Loader, LogOut } from "lucide-react";
 import { useUser } from "../api/auth.user";
 
-const UserAvatar = () => {
+const  UserAvatar = () => {
   const { signOut } = useAuthActions();
 
   const { user, isLoading } = useUser();
 
   if (isLoading)
     return (
-      <>
-        <p>Loading...</p>
-      </>
+      <div className="w-12 aspect-square flex justify-center items-center">
+        <Loader className="animate-spin" />
+      </div>
     );
 
   const { name, email } = user;
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
-        <Avatar className="size-14 outline-none border-none cursor-pointer">
+      <DropdownMenuTrigger className="w-12 aspect-square">
+        <Avatar className="w-full h-full outline-none border-none cursor-pointer">
           <AvatarFallback className="bg-amber-500 text-white text-2xl">
             <p>{name.charAt(0).toUpperCase()}</p>
           </AvatarFallback>
           <AvatarImage
-            className="outline-none border-none select-none"
+            className="outline-none h-full w-full border-none select-none"
             alt="Avatar"
             src={user?.image}
           />

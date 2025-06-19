@@ -48,7 +48,7 @@ const WorkSpacePopup = () => {
   if (!IsMounted) return null;
 
   return (
-    <Dialog open={open}>
+    <Dialog open={open} onOpenChange={e => setOpen(false)}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create a Workspace</DialogTitle>
