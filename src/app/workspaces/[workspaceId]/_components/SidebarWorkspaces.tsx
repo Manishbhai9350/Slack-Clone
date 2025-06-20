@@ -57,12 +57,12 @@ const SidebarDropDown = () => {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         {FilteredWorkspaces && FilteredWorkspaces.length > 0 && (
-          <>
-            <p>Available Workspaces</p>
+          <div>
+            <p className="pl-2">Available Workspaces</p>
             {FilteredWorkspaces?.map((workspace) => (
               <DropdownMenuItem
                 onClick={() => router.push(`/workspaces/${workspace._id}`)}
-                className="cursor-pointer overflow-hidden max-w-[200px]"
+                className="cursor-pointer overflow-hidden pl-2 max-w-[200px] w-full"
                 key={workspace._id}
               >
                 <div className="w-10 shrink-0 aspect-square bg-slate-700 text-white flex justify-center items-center rounded-md text-2xl">
@@ -71,7 +71,7 @@ const SidebarDropDown = () => {
                 <p className="truncate">{workspace.name}</p>
               </DropdownMenuItem>
             ))}
-          </>
+          </div>
         )}
         <DropdownMenuItem
           onClick={(e) => HandleCreateWorkspace(e)}

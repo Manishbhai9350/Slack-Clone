@@ -9,13 +9,18 @@ interface GetWorkspaceProps {
 }
 
 export const useGetWorkSpace = ({ workspaceId }: GetWorkspaceProps) => {
-  const Data = useQuery(api.workspaces.getWorkspace, { workspaceId });
-  
-  const IsLoading = useMemo(() => {
+  try {
+    const Data = useQuery(api.workspaces.getWorkspace, { workspaceId });
+
+    let IsLoading;
+
     if (typeof Data == "undefined") {
-      return true;
-    } else return false;
-  }, [Data]);
+      IsLoading =  true;
+    } else IsLoading =  false;
 
   return { Data, IsLoading };
+} catch (error) {
+  return { Data:null, IsLoading:false};
+  
+  }
 };
