@@ -18,17 +18,15 @@ import { ChevronDown, Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import UseCurrentMember from "@/features/workspace/api/useCurrentMember";
 
-export default function WorkspacePanel() {
+export default function WorkspacePanel({children}:{children:ReactNode}) {
   return (
-    <ResizablePanelGroup direction="horizontal" className="w-full h-full">
+    <ResizablePanelGroup autoSaveId={'workspace-resiable-panel'} defaultValue={0} direction="horizontal" className="w-full h-full">
       <ResizablePanel defaultSize={50} minSize={20} order={1}>
         <PanelSideBar />
       </ResizablePanel>
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize={50} order={2} minSize={10} color="#313131">
-        <div className="flex  items-center justify-center p-6">
-          <span className="font-semibold">Two</span>
-        </div>
+        {children}
       </ResizablePanel>
     </ResizablePanelGroup>
   );
@@ -75,7 +73,7 @@ function PanelSideBarHeader({
             variant="ghost"
             className="px-3 outline-none border-none hover:border-none active:border-none hover:outline-none active:outline-none cursor-pointer flex items-center gap-2 rounded-md text-4xl  text-white"
           >
-            <p className="truncate text-xl">{workspace.name}</p>
+            <p className="truncate text-xl max-w-[100px]">{workspace.name}</p>
             <ChevronDown size={50} className="mt-1 size-6" />
           </Button>
         </DropdownMenuTrigger>

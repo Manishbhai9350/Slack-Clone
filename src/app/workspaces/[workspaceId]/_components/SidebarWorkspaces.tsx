@@ -48,7 +48,7 @@ const SidebarDropDown = () => {
           </div>
         )}
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="max-w-[200px]" align="end">
+      <DropdownMenuContent className="max-w-[300px]" align="start">
         <DropdownMenuItem>
           <div>
             <h3 className="text-md">{Workspace?.name}</h3>

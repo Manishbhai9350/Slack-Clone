@@ -21,7 +21,9 @@ const WorkSpacePage = () => {
   const date = new Date(Data?._creationTime)
 
   return (
-    <WorkspacePanel />
+    <>
+      {JSON.stringify(Data)}
+    </>
   )
 }
 
