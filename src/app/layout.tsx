@@ -7,9 +7,8 @@ import { ConvexClientProvider } from "@/components/Providers/convex.provider";
 
 import Modals from "@/components/Modals";
 
-import { Toaster } from "@/components/ui/sonner"
- 
-
+import { Toaster } from "@/components/ui/sonner";
+import JotaiProvider from "@/components/Providers/jotai.provider";
 
 export const metadata: Metadata = {
   title: "Slack Clone",
@@ -26,9 +25,11 @@ export default function RootLayout({
       <html lang="en">
         <body>
           <ConvexClientProvider>
-            <Toaster position="top-center" />
-            <Modals />
-            {children}
+            <JotaiProvider>
+              <Toaster position="top-center" />
+              <Modals />
+              {children}
+            </JotaiProvider>
           </ConvexClientProvider>
         </body>
       </html>

@@ -11,16 +11,22 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { Doc } from "../../../../../convex/_generated/dataModel";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { useGetWorkSpace } from "@/features/workspace/api/useGetWorkspace";
 import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId";
 import { ChevronDown, Loader } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import UseCurrentMember from "@/features/workspace/api/useCurrentMember";
+import PrefrencesDialog from "./PrefrencesDialog";
 
-export default function WorkspacePanel({children}:{children:ReactNode}) {
+export default function WorkspacePanel({ children }: { children: ReactNode }) {
   return (
-    <ResizablePanelGroup autoSaveId={'workspace-resiable-panel'} defaultValue={0} direction="horizontal" className="w-full h-full">
+    <ResizablePanelGroup
+      autoSaveId={"workspace-resiable-panel"}
+      defaultValue={0}
+      direction="horizontal"
+      className="w-full h-full"
+    >
       <ResizablePanel defaultSize={50} minSize={20} order={1}>
         <PanelSideBar />
       </ResizablePanel>
@@ -65,8 +71,13 @@ function PanelSideBarHeader({
   workspace,
   member,
 }: PanelHeaderProps): ReactNode {
+
+
+  const [PrefrencesOpen, setPrefrencesOpen] = useState(false);
+
   return (
     <div className="header m-2 my-4 w-full px-2 flex items-center gap-2">
+      <PrefrencesDialog InitialName={workspace.name} setOpen={setPrefrencesOpen} open={PrefrencesOpen} />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -94,7 +105,7 @@ function PanelSideBarHeader({
                 <p className="truncate">Invite People To {workspace.name}</p>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer overflow-hidden ">
+              <DropdownMenuItem onClick={() => setPrefrencesOpen(!PrefrencesOpen)} className="cursor-pointer overflow-hidden ">
                 <p className="truncate">Prefrences</p>
               </DropdownMenuItem>
             </>

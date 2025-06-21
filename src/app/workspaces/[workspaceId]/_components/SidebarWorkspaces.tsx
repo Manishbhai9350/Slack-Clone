@@ -9,7 +9,10 @@ import { useGetWorkSpace } from "@/features/workspace/api/useGetWorkspace";
 import { useWorkspaces } from "@/features/workspace/api/useWorkspaces";
 import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId";
 import { useWorkspaceAtom } from "@/features/workspace/hooks/useWorkSpace";
-import { Loader, Plug, Plus, PlusSquare, PlusSquareIcon } from "lucide-react";
+
+
+
+import { Loader, Plug, Plus, PlusSquare, PlusSquareIcon, TriangleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 
@@ -32,28 +35,33 @@ const SidebarDropDown = () => {
     () => Workspaces?.filter((workspace) => workspace._id !== workspaceId),
     [Workspaces]
   );
-
-  if (!Workspace && !IsWorkspaceLoading) {
-    return null;
-  }
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="cursor-pointer h-10 aspect-square rounded-sm flex justify-center items-center hover:text-white bg-white/60">
         {IsWorkspaceLoading ? (
           <Loader className="animate-spin transition" />
         ) : (
+          (Workspace && !IsWorkspaceLoading)? (
           <div className={"Icon overflow-hidden text-2xl "}>
             {Workspace?.name?.charAt(0).toUpperCase()}
           </div>
+          ) : (
+            <TriangleAlert />
+          )
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent className="max-w-[300px]" align="start">
         <DropdownMenuItem>
-          <div>
-            <h3 className="text-md">{Workspace?.name}</h3>
-            <p className="text-xsm">Active Workspace</p>
-          </div>
+          {!Workspace && !IsWorkspaceLoading ? (
+            <div>
+              <p className="text-xsm">Unable To Find Workspace</p>
+            </div>
+          ) : (
+            <div>
+              <h3 className="text-md">{Workspace?.name}</h3>
+              <p className="text-xsm">Active Workspace</p>
+            </div>
+          )}
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         {FilteredWorkspaces && FilteredWorkspaces.length > 0 && (
