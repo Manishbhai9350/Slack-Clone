@@ -7,8 +7,7 @@ const schema = defineSchema({
   workspaces:defineTable({
     name:v.string(),
     user:v.id('users'),
-    joinCode:v.string(),
-    members:v.array(v.id('users'))
+    joinCode:v.string()
   }),
   members:defineTable({
     user:v.id('users'),
@@ -17,7 +16,12 @@ const schema = defineSchema({
   })
   .index('by_user',['user'])
   .index('by_workspace',['workspace'])
-  .index('by_user_workspace',['user','workspace'])
+  .index('by_user_workspace',['user','workspace']),
+  channels:defineTable({
+    name:v.string(),
+    workspace:v.id('workspaces'),
+  })
+  .index('by_workspace',['workspace'])
 });
  
 export default schema;

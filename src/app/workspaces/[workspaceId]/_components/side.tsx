@@ -1,7 +1,7 @@
 import React from 'react'
 import SidebarButton from './SidebarButton'
 import { Bell, Home, MessageSquare, MoreHorizontal } from 'lucide-react'
-import SidebarDropDown from './SidebarWorkspaces'
+import SidebarDropDown from './SidebarDropdown'
 import UserAvatar from '@/features/auth/components/UserAvatar'
 
 const WorkspaceSidebar = () => {

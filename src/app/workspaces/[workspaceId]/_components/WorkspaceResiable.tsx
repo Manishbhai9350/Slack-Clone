@@ -14,10 +14,25 @@ import { Doc } from "../../../../../convex/_generated/dataModel";
 import { ReactNode, useState } from "react";
 import { useGetWorkSpace } from "@/features/workspace/api/useGetWorkspace";
 import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId";
-import { ChevronDown, Loader } from "lucide-react";
+import {
+  AlertTriangle,
+  ChevronDown,
+  DiamondMinus,
+  Hash,
+  Loader,
+  MessageSquareText,
+  Plus,
+  SendHorizonal,
+  SendToBack,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import UseCurrentMember from "@/features/workspace/api/useCurrentMember";
 import PrefrencesDialog from "./PrefrencesDialog";
+import PanelItem from "./PanelItem";
+import PanelItemSection from "./PanelItemSection";
+import { useGetChannels } from "@/features/workspace/api/useGetChannels";
+import { useGetMembers } from "@/features/workspace/api/useGetMembers";
+import PanelMemberItem from "./PanelMemberItem";
 
 export default function WorkspacePanel({ children }: { children: ReactNode }) {
   return (
@@ -43,7 +58,13 @@ function PanelSideBar() {
   const { Data: Workspace, IsLoading: WorkspaceLoading } = useGetWorkSpace({
     workspaceId,
   });
+  const { Data: Channels, IsLoading: ChannelsLoading } = useGetChannels({
+    workspaceId,
+  });
   const { Data: Member, IsLoading: MemberLoading } = UseCurrentMember({
+    workspaceId,
+  });
+  const { Data: Members, IsLoading: MembersLoading } = useGetMembers({
     workspaceId,
   });
 
@@ -56,8 +77,43 @@ function PanelSideBar() {
   }
 
   return (
-    <div className="flex flex-col space-y-1 w-full h-full bg-slate-600">
+    <div className="flex flex-col w-full h-full bg-slate-600">
       <PanelSideBarHeader member={Member} workspace={Workspace} />
+      <PanelItemSection>
+        <PanelItem icon={MessageSquareText} label="Threads" />
+        <PanelItem icon={SendHorizonal} label="Drafts & Sent" />
+      </PanelItemSection>
+      <PanelItemSection endHint="Add Channels" onEnd={() => {}} end={Plus} seperator label="channels" toggle>
+        {
+          ChannelsLoading && (
+            <Loader className="animate-spin" />
+          )
+        }{
+          Channels && Channels.length > 0 && Channels.map(Item => (
+            <PanelItem key={Item._id} icon={Hash} label={Item.name} />
+          ))
+        }
+      </PanelItemSection>
+      <PanelItemSection endHint='Add New DM' onEnd={() => {}} end={Plus} seperator label="Direct Messages" toggle>
+        {
+          MemberLoading && (
+            <Loader className="animate-spin" />
+          )
+        }
+        {
+          Members?.length == 0 && !MemberLoading && (
+            <>
+            <p>Unable To Find Members</p>
+            <AlertTriangle />
+            </>
+          )
+        }
+        {
+          Members && Members.length > 0 && Members.map(Item => (
+            <PanelMemberItem key={Item._id} name={Item.User?.name} image={Item.User?.image}  />
+          ))
+        }
+      </PanelItemSection>
     </div>
   );
 }
@@ -71,13 +127,15 @@ function PanelSideBarHeader({
   workspace,
   member,
 }: PanelHeaderProps): ReactNode {
-
-
   const [PrefrencesOpen, setPrefrencesOpen] = useState(false);
 
   return (
     <div className="header m-2 my-4 w-full px-2 flex items-center gap-2">
-      <PrefrencesDialog InitialName={workspace.name} setOpen={setPrefrencesOpen} open={PrefrencesOpen} />
+      <PrefrencesDialog
+        InitialName={workspace.name}
+        setOpen={setPrefrencesOpen}
+        open={PrefrencesOpen}
+      />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -105,7 +163,10 @@ function PanelSideBarHeader({
                 <p className="truncate">Invite People To {workspace.name}</p>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setPrefrencesOpen(!PrefrencesOpen)} className="cursor-pointer overflow-hidden ">
+              <DropdownMenuItem
+                onClick={() => setPrefrencesOpen(!PrefrencesOpen)}
+                className="cursor-pointer overflow-hidden "
+              >
                 <p className="truncate">Prefrences</p>
               </DropdownMenuItem>
             </>

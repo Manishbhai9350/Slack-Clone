@@ -1,7 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { Id, DataModel } from "./_generated/dataModel";
+import { GenerateJoinCode } from "./lib";
 
 export const create = mutation({
   args: {
@@ -13,20 +13,24 @@ export const create = mutation({
       throw new Error("Unauthorized");
     }
 
-    const joinCode = "444444";
+    const joinCode = GenerateJoinCode();
 
     const CreatedWorkSpaceId = await ctx.db.insert("workspaces", {
       name: args.name,
       joinCode,
-      user: UserId,
-      members: [UserId],
+      user: UserId
     });
 
-    const CreatedMemberId = await ctx.db.insert("members", {
+    await ctx.db.insert("members", {
       user: UserId,
       workspace: CreatedWorkSpaceId,
       role: "admin",
     });
+
+    await ctx.db.insert("channels",{
+      name:'general',
+      workspace:CreatedWorkSpaceId
+    })
 
     return CreatedWorkSpaceId;
   },
