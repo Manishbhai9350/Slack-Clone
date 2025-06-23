@@ -1,4 +1,4 @@
-import WorkSpacePage from "@/features/workspace/componenets/workspace.page"
+import WorkSpacePage from "@/features/workspace/components/workspace.page"
 
 const Workspace = () => {
   return (

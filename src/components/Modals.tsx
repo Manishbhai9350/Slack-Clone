@@ -1,9 +1,11 @@
-import WorkSpacePopup from "@/features/workspace/componenets/workspace.popup"
+import CreateChannelModel from "@/features/channels/components/Create.Modal"
+import WorkSpacePopup from "@/features/workspace/components/workspace.popup"
 
 const Modals = () => {
   return (
     <>
-        <WorkSpacePopup />
+      <CreateChannelModel />
+      <WorkSpacePopup />
     </>
   )
 }

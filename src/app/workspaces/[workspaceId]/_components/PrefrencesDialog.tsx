@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useRemoveWorkSpace } from "@/features/workspace/api/removeWorkspace";
 import { useUpdateWorkSpace } from "@/features/workspace/api/updateWorkspace";
-import UseConfirm from "@/features/workspace/hooks/useConfirm";
+import UseConfirm from "@/components/hooks/useConfirm";
 import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId";
 import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";

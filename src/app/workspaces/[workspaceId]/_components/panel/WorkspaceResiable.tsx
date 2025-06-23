@@ -17,13 +17,11 @@ import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId"
 import {
   AlertTriangle,
   ChevronDown,
-  DiamondMinus,
   Hash,
   Loader,
   MessageSquareText,
   Plus,
   SendHorizonal,
-  SendToBack,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import UseCurrentMember from "@/features/workspace/api/useCurrentMember";
@@ -33,9 +31,9 @@ import PanelItemSection from "./PanelItemSection";
 import { useGetChannels } from "@/features/channels/api/useGetChannels";
 import { useGetMembers } from "@/features/workspace/api/useGetMembers";
 import PanelMemberItem from "./PanelMemberItem";
-import CreateModal from "@/components/Create.Modal";
 import { useCreateChannel } from "@/features/channels/api/useCreateChannel";
 import { toast } from "sonner";
+import { useChannelAtom } from "@/features/channels/hooks/useChannel";
 
 export default function WorkspacePanel({ children }: { children: ReactNode }) {
   return (
@@ -71,6 +69,9 @@ export default function WorkspacePanel({ children }: { children: ReactNode }) {
 function PanelSideBar() {
   const workspaceId = useGetWorkspaceId();
 
+    const [_open, setOpen] = useChannelAtom();
+  
+
   const { Data: Workspace, IsLoading: WorkspaceLoading } = useGetWorkSpace({
     workspaceId,
   });
@@ -84,27 +85,8 @@ function PanelSideBar() {
     workspaceId,
   });
 
+  
 
-  const { mutate,IsPending:ChannelCreationPending } =
-      useCreateChannel();
-
-  const [ChannelCreateOpen, setChannelCreateOpen] = useState(false);
-
-  function HandleCreateChannel(value:string) {
-    if(value.length < 3) {
-      toast.error("Channel name must be atleast 3 characters long")
-      return;
-    }
-    const Data = mutate(
-      { name: value,workspaceId },
-      {
-        onSuccess: () => {
-          setChannelCreateOpen(false)
-          toast.success('Channel Created')
-        }
-      }
-    );
-  }
 
   if (WorkspaceLoading || MemberLoading) {
     return <Loader className="animate-spin transition" />;
@@ -123,19 +105,9 @@ function PanelSideBar() {
       </PanelItemSection>
       <PanelItemSection
         endHint="Add Channels"
-        onEnd={() => {}}
-        end={
-          <CreateModal
-            open={ChannelCreateOpen}
-            disabled={ChannelCreationPending}
-            setOpen={setChannelCreateOpen}
-            onCreate={HandleCreateChannel}
-            label="Create New DM"
-            placeholder="Channel Name e.q: 'Assistance', 'Boys'"
-          >
-            <Plus />
-          </CreateModal>
-        }
+        onEnd={() => setOpen(true)}
+        end={Plus}
+        role={Member.role}
         seperator
         label="channels"
         toggle
@@ -150,7 +122,8 @@ function PanelSideBar() {
       <PanelItemSection
         endHint="Add New DM"
         onEnd={() => {}}
-        end={<Plus />}
+        end={Plus}
+        role={Member.role}
         seperator
         label="Direct Messages"
         toggle
