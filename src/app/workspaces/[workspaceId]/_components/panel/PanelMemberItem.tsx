@@ -36,7 +36,7 @@ const PanelMemberItem = ({
             src={image}
           />
         </Avatar>
-        <p className="text-xl">{name}</p>
+        <p className="text-xl truncate">{name}</p>
       </div>
     </Link>
   );

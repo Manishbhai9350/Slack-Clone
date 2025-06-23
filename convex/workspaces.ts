@@ -1,7 +1,7 @@
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
-import { GenerateJoinCode } from "./lib";
+import { GenerateJoinCode } from "./lib/index";
 
 export const create = mutation({
   args: {

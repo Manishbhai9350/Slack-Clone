@@ -7,7 +7,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useRemoveWorkSpace } from "@/features/workspace/api/removeWorkspace copy";
+import { useRemoveWorkSpace } from "@/features/workspace/api/removeWorkspace";
 import { useUpdateWorkSpace } from "@/features/workspace/api/updateWorkspace";
 import UseConfirm from "@/features/workspace/hooks/useConfirm";
 import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId";

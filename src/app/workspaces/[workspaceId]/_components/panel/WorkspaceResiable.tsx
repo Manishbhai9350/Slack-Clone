@@ -10,7 +10,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { Doc } from "../../../../../convex/_generated/dataModel";
+import { Doc } from "../../../../../../convex/_generated/dataModel";
 import { ReactNode, useState } from "react";
 import { useGetWorkSpace } from "@/features/workspace/api/useGetWorkspace";
 import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId";
@@ -27,12 +27,15 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import UseCurrentMember from "@/features/workspace/api/useCurrentMember";
-import PrefrencesDialog from "./PrefrencesDialog";
+import PrefrencesDialog from "../PrefrencesDialog";
 import PanelItem from "./PanelItem";
 import PanelItemSection from "./PanelItemSection";
-import { useGetChannels } from "@/features/workspace/api/useGetChannels";
+import { useGetChannels } from "@/features/channels/api/useGetChannels";
 import { useGetMembers } from "@/features/workspace/api/useGetMembers";
 import PanelMemberItem from "./PanelMemberItem";
+import CreateModal from "@/components/Create.Modal";
+import { useCreateChannel } from "@/features/channels/api/useCreateChannel";
+import { toast } from "sonner";
 
 export default function WorkspacePanel({ children }: { children: ReactNode }) {
   return (
@@ -42,11 +45,23 @@ export default function WorkspacePanel({ children }: { children: ReactNode }) {
       direction="horizontal"
       className="w-full h-full"
     >
-      <ResizablePanel defaultSize={50} minSize={20} order={1}>
+      <ResizablePanel
+        className="md:min-w-[270px]"
+        defaultSize={50}
+        minSize={20}
+        order={1}
+      >
         <PanelSideBar />
       </ResizablePanel>
       <ResizableHandle withHandle />
-      <ResizablePanel defaultSize={50} order={2} minSize={10} color="#313131">
+      <ResizablePanel
+        collapsible
+        collapsedSize={10}
+        defaultSize={50}
+        order={2}
+        minSize={10}
+        color="#313131"
+      >
         {children}
       </ResizablePanel>
     </ResizablePanelGroup>
@@ -55,6 +70,7 @@ export default function WorkspacePanel({ children }: { children: ReactNode }) {
 
 function PanelSideBar() {
   const workspaceId = useGetWorkspaceId();
+
   const { Data: Workspace, IsLoading: WorkspaceLoading } = useGetWorkSpace({
     workspaceId,
   });
@@ -67,6 +83,28 @@ function PanelSideBar() {
   const { Data: Members, IsLoading: MembersLoading } = useGetMembers({
     workspaceId,
   });
+
+
+  const { mutate,IsPending:ChannelCreationPending } =
+      useCreateChannel();
+
+  const [ChannelCreateOpen, setChannelCreateOpen] = useState(false);
+
+  function HandleCreateChannel(value:string) {
+    if(value.length < 3) {
+      toast.error("Channel name must be atleast 3 characters long")
+      return;
+    }
+    const Data = mutate(
+      { name: value,workspaceId },
+      {
+        onSuccess: () => {
+          setChannelCreateOpen(false)
+          toast.success('Channel Created')
+        }
+      }
+    );
+  }
 
   if (WorkspaceLoading || MemberLoading) {
     return <Loader className="animate-spin transition" />;
@@ -83,36 +121,56 @@ function PanelSideBar() {
         <PanelItem icon={MessageSquareText} label="Threads" />
         <PanelItem icon={SendHorizonal} label="Drafts & Sent" />
       </PanelItemSection>
-      <PanelItemSection endHint="Add Channels" onEnd={() => {}} end={Plus} seperator label="channels" toggle>
-        {
-          ChannelsLoading && (
-            <Loader className="animate-spin" />
-          )
-        }{
-          Channels && Channels.length > 0 && Channels.map(Item => (
+      <PanelItemSection
+        endHint="Add Channels"
+        onEnd={() => {}}
+        end={
+          <CreateModal
+            open={ChannelCreateOpen}
+            disabled={ChannelCreationPending}
+            setOpen={setChannelCreateOpen}
+            onCreate={HandleCreateChannel}
+            label="Create New DM"
+            placeholder="Channel Name e.q: 'Assistance', 'Boys'"
+          >
+            <Plus />
+          </CreateModal>
+        }
+        seperator
+        label="channels"
+        toggle
+      >
+        {ChannelsLoading && <Loader className="animate-spin" />}
+        {Channels &&
+          Channels.length > 0 &&
+          Channels.map((Item) => (
             <PanelItem key={Item._id} icon={Hash} label={Item.name} />
-          ))
-        }
+          ))}
       </PanelItemSection>
-      <PanelItemSection endHint='Add New DM' onEnd={() => {}} end={Plus} seperator label="Direct Messages" toggle>
-        {
-          MemberLoading && (
-            <Loader className="animate-spin" />
-          )
-        }
-        {
-          Members?.length == 0 && !MemberLoading && (
-            <>
+      <PanelItemSection
+        endHint="Add New DM"
+        onEnd={() => {}}
+        end={<Plus />}
+        seperator
+        label="Direct Messages"
+        toggle
+      >
+        {MemberLoading && <Loader className="animate-spin" />}
+        {Members?.length == 0 && !MemberLoading && (
+          <>
             <p>Unable To Find Members</p>
             <AlertTriangle />
-            </>
-          )
-        }
-        {
-          Members && Members.length > 0 && Members.map(Item => (
-            <PanelMemberItem key={Item._id} name={Item.User?.name} image={Item.User?.image}  />
-          ))
-        }
+          </>
+        )}
+        {Members &&
+          Members.length > 0 &&
+          Members.map((Item) => (
+            <PanelMemberItem
+              key={Item._id}
+              name={Item.User?.name}
+              image={Item.User?.image}
+            />
+          ))}
       </PanelItemSection>
     </div>
   );

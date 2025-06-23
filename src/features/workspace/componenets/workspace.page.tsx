@@ -1,5 +1,5 @@
 'use client'
-import WorkspacePanel from '@/app/workspaces/[workspaceId]/_components/WorkspaceResiable';
+import WorkspacePanel from '@/app/workspaces/[workspaceId]/_components/panel/WorkspaceResiable';
 import { useGetWorkSpace } from '../api/useGetWorkspace'
 import { useGetWorkspaceId } from '../hooks/useGetWorkspaceId'
 

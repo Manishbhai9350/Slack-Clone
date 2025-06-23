@@ -2,8 +2,8 @@
 
 import React from "react";
 import WorkspaceNav from "./_components/nav";
-import WorkspaceSidebar from "./_components/side";
-import WorkspacePanel from "./_components/WorkspaceResiable";
+import WorkspaceSidebar from "./_components/sidebar/side";
+import WorkspacePanel from "./_components/panel/WorkspaceResiable";
 
 interface workspaceLayoutProps {
   children: React.ReactNode;

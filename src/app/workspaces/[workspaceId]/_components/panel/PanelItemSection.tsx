@@ -1,8 +1,6 @@
 import Hint from "@/components/Hint";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
-import { LucideIcon, Plus, Triangle } from "lucide-react";
 import { ReactNode } from "react";
 import { FaCaretDown } from "react-icons/fa";
 import { useToggle } from "react-use";
@@ -12,7 +10,7 @@ interface PanelItemsSectionProps {
   children: ReactNode;
   label?: string;
   toggle?: boolean;
-  end?: LucideIcon;
+  end?: ReactNode;
   onEnd?: () => void;
   endHint?: string;
 }
@@ -22,7 +20,7 @@ const PanelItemSection = ({
   seperator,
   label,
   toggle,
-  end: EndIcon,
+  end: EndComponent,
   onEnd,
   endHint=''
 }: PanelItemsSectionProps) => {
@@ -50,13 +48,13 @@ const PanelItemSection = ({
         ) : (
           label && <p>{label}</p>
         )}
-        {EndIcon && (
+        {EndComponent && (
           <Hint label={endHint}>
             <div
               onClick={onEnd}
               className="end hover:bg-white/70 hover:text-slate-800 text-white cursor-pointer p-1 transition duration-300 rounded-xs"
             >
-              <EndIcon />
+              {EndComponent}
             </div>
           </Hint>
         )}
