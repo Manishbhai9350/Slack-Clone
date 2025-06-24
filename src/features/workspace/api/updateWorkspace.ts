@@ -33,7 +33,7 @@ export const useUpdateWorkSpace = () => {
     async (values: mutateValues, options?: mutateOptions) => {
       try {
         setData(null)
-        setState('')
+        setState('pending')
         const { id, name } = values;
         const Response = await mutation({ id,name });
         setData(Response)

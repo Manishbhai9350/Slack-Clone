@@ -8,9 +8,7 @@ const GenRL = (R:number,L:number,Min=0,Max=L) => {
 }
 
 
-export const GenerateJoinCode = () => {
-    const R = Math.random() 
-    const RL = GenRL(R,JoinPatch.length,3,10)
-    const RawCode = new Array(RL).fill('_').map(e => JoinPatch[GenRL(Math.random(),JoinPatch.length,0)]).join('')
+export const GenerateJoinCode = (Length=6) => {
+    const RawCode = new Array(Length).fill('_').map(e => JoinPatch[GenRL(Math.random(),JoinPatch.length,0)]).join('')
     return RawCode
 }

@@ -31,9 +31,8 @@ import PanelItemSection from "./PanelItemSection";
 import { useGetChannels } from "@/features/channels/api/useGetChannels";
 import { useGetMembers } from "@/features/workspace/api/useGetMembers";
 import PanelMemberItem from "./PanelMemberItem";
-import { useCreateChannel } from "@/features/channels/api/useCreateChannel";
-import { toast } from "sonner";
 import { useChannelAtom } from "@/features/channels/hooks/useChannel";
+import InviteModal from "./InviteModal";
 
 export default function WorkspacePanel({ children }: { children: ReactNode }) {
   return (
@@ -69,8 +68,7 @@ export default function WorkspacePanel({ children }: { children: ReactNode }) {
 function PanelSideBar() {
   const workspaceId = useGetWorkspaceId();
 
-    const [_open, setOpen] = useChannelAtom();
-  
+  const [_open, setOpen] = useChannelAtom();
 
   const { Data: Workspace, IsLoading: WorkspaceLoading } = useGetWorkSpace({
     workspaceId,
@@ -84,9 +82,6 @@ function PanelSideBar() {
   const { Data: Members, IsLoading: MembersLoading } = useGetMembers({
     workspaceId,
   });
-
-  
-
 
   if (WorkspaceLoading || MemberLoading) {
     return <Loader className="animate-spin transition" />;
@@ -159,6 +154,7 @@ function PanelSideBarHeader({
   member,
 }: PanelHeaderProps): ReactNode {
   const [PrefrencesOpen, setPrefrencesOpen] = useState(false);
+  const [InviteModalOpen, setInviteModalOpen] = useState(false);
 
   return (
     <div className="header m-2 my-4 w-full px-2 flex items-center gap-2">
@@ -167,6 +163,7 @@ function PanelSideBarHeader({
         setOpen={setPrefrencesOpen}
         open={PrefrencesOpen}
       />
+      <InviteModal name={workspace.name} joinCode={workspace.joinCode} open={InviteModalOpen} setOpen={setInviteModalOpen} />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -190,9 +187,9 @@ function PanelSideBarHeader({
           {member.role == "admin" && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer overflow-hidden ">
-                <p className="truncate">Invite People To {workspace.name}</p>
-              </DropdownMenuItem>
+                <DropdownMenuItem onClick={e => setInviteModalOpen(true)} className="cursor-pointer overflow-hidden ">
+                  <p className="truncate">Invite People To {workspace.name}</p>
+                </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => setPrefrencesOpen(!PrefrencesOpen)}

@@ -32,7 +32,7 @@ export const useCreateWorkSpace = () => {
     async (values: mutateValues, options?: mutateOptions) => {
       try {
         setData(null)
-        setState('')
+        setState('pending')
         const { name } = values;
         const Response = await mutation({ name });
         setData(Response)
