@@ -14,7 +14,6 @@ import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId"
 import { cn } from "@/lib/utils";
 import { Check, LinkIcon, RefreshCw } from "lucide-react";
 import { useState } from "react";
-import { FcRight } from "react-icons/fc";
 import { toast } from "sonner";
 
 interface InviteModalProps {
