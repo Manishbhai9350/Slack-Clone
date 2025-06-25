@@ -6,21 +6,18 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { useChannelAtom } from "../hooks/useChannel";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import React, { FormEvent, ReactNode, useState } from "react";
+import React, { FormEvent,  useState } from "react";
 import { toast } from "sonner";
 import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId";
 import { useCreateChannel } from "../api/useCreateChannel";
 
-interface CreateModalprops {
-  children: ReactNode;
-}
 
-const CreateChannelModel = ({ children }: CreateModalprops) => {
+
+const CreateChannelModel = () => {
   const [open, setOpen] = useChannelAtom();
   const [Value, setValue] = useState("");
 
@@ -61,7 +58,6 @@ const CreateChannelModel = ({ children }: CreateModalprops) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create A New Channel</DialogTitle>
