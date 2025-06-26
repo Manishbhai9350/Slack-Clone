@@ -2,13 +2,13 @@ import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { Id } from "../../../../convex/_generated/dataModel";
 
-interface GetChannelsProps {
-  workspaceId: Id<"workspaces">;
+interface GetWorkspaceProps {
+  id: Id<"channels">;
 }
 
-export const useGetChannels = ({ workspaceId }: GetChannelsProps) => {
+export const useGetChannel = ({ id }: GetWorkspaceProps) => {
   try {
-    const Data = useQuery(api.channels.get, { workspaceId });
+    const Data = useQuery(api.channels.getById, { id });
 
     let IsLoading;
 

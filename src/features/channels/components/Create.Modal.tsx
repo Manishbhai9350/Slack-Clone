@@ -14,6 +14,7 @@ import React, { FormEvent,  useState } from "react";
 import { toast } from "sonner";
 import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId";
 import { useCreateChannel } from "../api/useCreateChannel";
+import { useRouter } from "next/navigation";
 
 
 
@@ -21,8 +22,9 @@ const CreateChannelModel = () => {
   const [open, setOpen] = useChannelAtom();
   const [Value, setValue] = useState("");
 
+  const Router = useRouter()
   
-    const workspaceId = useGetWorkspaceId();
+  const workspaceId = useGetWorkspaceId();
 
   const { mutate, IsPending: ChannelCreationPending } = useCreateChannel();
 
@@ -39,14 +41,15 @@ const CreateChannelModel = () => {
       toast.error("Channel name must be atleast 3 characters long");
       return;
     }
-    const Data = mutate(
+    mutate(
       { name: Value, workspaceId },
       {
         throwError:true,
-        onSuccess: () => {
+        onSuccess: (channelId) => {
           setOpen(false)
           setValue('')
           toast.success("Channel Created");
+          Router.push(`/workspaces/${workspaceId}/channel/${channelId}`)
         },
         onError:(error) => {
           console.log(error)

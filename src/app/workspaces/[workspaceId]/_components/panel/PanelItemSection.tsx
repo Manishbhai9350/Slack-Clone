@@ -13,6 +13,7 @@ interface PanelItemsSectionProps {
   endHint?: string;
   role?: string;
   toggle?: boolean;
+  opened?: boolean;
   end?: LucideIcon;
   onEnd?: () => void;
 }
@@ -22,15 +23,16 @@ const PanelItemSection = ({
   seperator,
   label,
   toggle,
+  opened=false,
   end: Icon,
   onEnd,
   endHint='',
   role = 'member'
 }: PanelItemsSectionProps) => {
-  const [on, Toggle] = useToggle(false);
+  const [on, Toggle] = useToggle(opened);
 
   return (
-    <div className="flex flex-col space-y-1.5 px-4 mb-4">
+    <div className="flex flex-col px-4 mb-4">
       {seperator && <Separator className="opacity-50" />}
       <div className="head flex justify-between items-center">
         {label && toggle ? (

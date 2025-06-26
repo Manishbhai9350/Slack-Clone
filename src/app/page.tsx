@@ -7,7 +7,7 @@ import { useWorkspaceAtom } from "@/features/workspace/hooks/useWorkSpace";
 
 export default function Home() {
   const { Data, IsLoading } = useWorkspaces();
-  const [open, setOpen] = useWorkspaceAtom();
+  const [_, setOpen] = useWorkspaceAtom();
 
 
   const WorkSpaceId = useMemo(() => Data?.[0]?._id,[Data])

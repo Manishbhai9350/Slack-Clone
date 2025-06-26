@@ -1,20 +1,4 @@
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
-import { Doc } from "../../../../../../convex/_generated/dataModel";
-import { ReactNode, useState } from "react";
-import { useGetWorkSpace } from "@/features/workspace/api/useGetWorkspace";
-import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId";
-import {
   AlertTriangle,
   ChevronDown,
   Hash,
@@ -22,10 +6,34 @@ import {
   MessageSquareText,
   Plus,
   SendHorizonal,
+  TriangleAlert,
 } from "lucide-react";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+
+
+import { Doc } from "../../../../../../convex/_generated/dataModel";
+import { ReactNode, useEffect, useMemo, useState } from "react";
+import { useGetWorkSpace } from "@/features/workspace/api/useGetWorkspace";
+import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId";
+
+
 import { Button } from "@/components/ui/button";
-import UseCurrentMember from "@/features/workspace/api/useCurrentMember";
 import PrefrencesDialog from "../PrefrencesDialog";
+import UseCurrentMember from "@/features/workspace/api/useCurrentMember";
 import PanelItem from "./PanelItem";
 import PanelItemSection from "./PanelItemSection";
 import { useGetChannels } from "@/features/channels/api/useGetChannels";
@@ -33,6 +41,7 @@ import { useGetMembers } from "@/features/workspace/api/useGetMembers";
 import PanelMemberItem from "./PanelMemberItem";
 import { useChannelAtom } from "@/features/channels/hooks/useChannel";
 import InviteModal from "./InviteModal";
+import ChannelItem from "./ChannelItem";
 
 export default function WorkspacePanel({ children }: { children: ReactNode }) {
   return (
@@ -83,6 +92,7 @@ function PanelSideBar() {
     workspaceId,
   });
 
+
   if (WorkspaceLoading || MemberLoading) {
     return <Loader className="animate-spin transition" />;
   }
@@ -99,6 +109,7 @@ function PanelSideBar() {
         <PanelItem icon={SendHorizonal} label="Drafts & Sent" />
       </PanelItemSection>
       <PanelItemSection
+        opened
         endHint="Add Channels"
         onEnd={() => setOpen(true)}
         end={Plus}
@@ -111,10 +122,11 @@ function PanelSideBar() {
         {Channels &&
           Channels.length > 0 &&
           Channels.map((Item) => (
-            <PanelItem key={Item._id} icon={Hash} label={Item.name} />
+            <ChannelItem key={Item._id} id={Item._id} icon={Hash} label={Item.name} />
           ))}
       </PanelItemSection>
       <PanelItemSection
+        opened
         endHint="Add New DM"
         onEnd={() => {}}
         end={Plus}

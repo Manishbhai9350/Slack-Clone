@@ -33,6 +33,76 @@ export const create = mutation({
   },
 });
 
+export const remove = mutation({
+  args:{
+    id:v.id('channels'),
+  },
+  handler:async (ctx,args) => {
+     const UserId = await getAuthUserId(ctx);
+    if (!UserId) {
+      throw new Error("Unauthorized");
+    }
+
+    const Channel = await ctx.db.get(args.id);
+
+    if(!Channel) {
+      throw new Error('Unauthorized')
+    }
+
+    const CurrentMember = await ctx.db
+      .query("members")
+      .withIndex("by_user_workspace", (e) =>
+        e.eq("user", UserId).eq("workspace",Channel.workspace)
+      )
+      .unique();
+
+    if (!CurrentMember || CurrentMember.role !== "admin") {
+      throw new Error("Unauthorized");
+    } 
+
+    await ctx.db.delete(args.id);
+
+    return true;
+  }
+})
+
+
+export const update = mutation({
+  args:{
+    id:v.id('channels'),
+    name:v.string()
+  },
+  handler:async (ctx,args) => {
+     const UserId = await getAuthUserId(ctx);
+    if (!UserId) {
+      throw new Error("Unauthorized");
+    }
+
+    const Channel = await ctx.db.get(args.id);
+
+    if(!Channel) {
+      throw new Error('Unauthorized')
+    }
+
+    const CurrentMember = await ctx.db
+      .query("members")
+      .withIndex("by_user_workspace", (e) =>
+        e.eq("user", UserId).eq("workspace",Channel.workspace)
+      )
+      .unique();
+
+    if (!CurrentMember || CurrentMember.role !== "admin") {
+      throw new Error("Unauthorized");
+    } 
+
+    await ctx.db.patch(args.id,{
+      name:args.name
+    })
+
+    return args.id;
+  }
+})
+
 export const get = query({
   args: {
     workspaceId: v.id("workspaces"),
@@ -49,5 +119,20 @@ export const get = query({
       .collect();
 
     return Channels;
+  },
+});
+export const getById = query({
+  args: {
+    id: v.id("channels"),
+  },
+  handler: async (ctx, args) => {
+    const UserId = await getAuthUserId(ctx);
+    if (!UserId) {
+      return [];
+    }
+
+    const Channel = await ctx.db.get(args.id)
+
+    return Channel;
   },
 });
