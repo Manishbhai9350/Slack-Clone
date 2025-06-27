@@ -8,6 +8,7 @@ import {  useEffect, useMemo } from "react";
 import { useGetChannelId } from "@/features/channels/hooks/useChannelId";
 import Header from "./_components/Header";
 import { useGetChannel } from "@/features/channels/api/useGetChannel";
+import ChatInput from "@/app/workspaces/_components/ChatInput";
 
 const ChannelPage = () => {
   const workspaceId = useGetWorkspaceId();
@@ -43,8 +44,10 @@ const ChannelPage = () => {
   }
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full flex flex-col">
       <Header name={ChannelData?.name || ''} />
+      <div className="flex-1"></div>
+      <ChatInput />
     </div>
   );
 };

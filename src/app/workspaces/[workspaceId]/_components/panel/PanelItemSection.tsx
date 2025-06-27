@@ -34,7 +34,7 @@ const PanelItemSection = ({
   return (
     <div className="flex flex-col px-4 mb-4">
       {seperator && <Separator className="opacity-50" />}
-      <div className="head flex justify-between items-center">
+      <div className="head flex justify-between items-center pt-2">
         {label && toggle ? (
           <div
             onClick={Toggle}
