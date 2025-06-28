@@ -23,7 +23,7 @@ const ChatInput = () => {
 
   async function HandleSubmit(value: Delta, ImageInput:HTMLInputElement) {
 
-    const image = ImageInput.files[0]
+    const image = ImageInput?.files[0]
 
     if (!InnerRef.current || (!value && !image)) return;
 
