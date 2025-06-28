@@ -33,8 +33,7 @@ export const useCreateWorkSpace = () => {
       try {
         setData(null)
         setState('pending')
-        const { name } = values;
-        const Response = await mutation({ name });
+        const Response = await mutation(values);
         setData(Response)
         setState('success')
         options?.onSuccess?.(Response)

@@ -34,8 +34,7 @@ export const useCreateChannel = () => {
       try {
         setData(null)
         setState('pending')
-        const { name,workspaceId } = values;
-        const Response = await mutation({ name, workspaceId });
+        const Response = await mutation(values);
         setData(Response)
         setState('success')
         options?.onSuccess?.(Response)

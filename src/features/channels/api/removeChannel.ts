@@ -33,8 +33,7 @@ export const useRemoveChannel = () => {
       try {
         setData(null)
         setState('pending')
-        const { id } = values;
-        const Response = await mutation({ id });
+        const Response = await mutation(values);
         setData(Response)
         setState('success')
         options?.onSuccess?.(Response)

@@ -21,7 +21,15 @@ const schema = defineSchema({
     name:v.string(),
     workspace:v.id('workspaces'),
   })
-  .index('by_workspace',['workspace'])
+  .index('by_workspace',['workspace']),
+  messages:defineTable({
+    message:v.string(),
+    workspace:v.id('workspaces'),
+    channel:v.optional(v.string()),
+    image:v.optional(v.id('_storage')),
+    user:v.id('users'),
+    parent:v.optional(v.id('messages'))
+  })
 });
  
 export default schema;

@@ -28,12 +28,11 @@ export const useJoinWorkspace = () => {
   const IsSetteled = useMemo(() => state == "setteled", [state]);
 
   const mutate = useCallback(
-   async  (values: Requestvalues, options: OptionsMethods) => {
+    async (values: Requestvalues, options: OptionsMethods) => {
       try {
         setData(null);
         setState("pending");
-        const { workspaceId,joinCode } = values;
-        const Response = await mutation({ joinCode,workspaceId });
+        const Response = await mutation(values);
         setData(Response);
         setState("success");
         options?.onSuccess?.(Response);

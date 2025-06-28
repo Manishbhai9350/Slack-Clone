@@ -1,33 +1,47 @@
-import Quill, { QuillOptions } from "quill";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import Quill, { Delta, QuillOptions } from "quill";
+import { Ref, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { Smile, ImageIcon } from "lucide-react";
+import { Smile, ImageIcon, XIcon } from "lucide-react";
 import { PiTextAa } from "react-icons/pi";
 import { MdSend } from "react-icons/md";
 
 import "quill/dist/quill.snow.css";
 import { Button } from "./ui/button";
 import Hint from "./Hint";
+import EmojiPopover from "./EmojiPopover";
+import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface EditorProps {
   variant?: "create" | "update";
-  onSubmit:() => void;
-  onCancel:() => void;
-  placeholder:string;
-  disabled:boolean;
+  onSubmit: (value: Delta, elem:HTMLInputElement) => void;
+  onCancel: () => void;
+  placeholder: string;
+  disabled: boolean;
+  innerRef: Ref;
 }
 
-const Editor = ({ variant = "create", placeholder, onCancel, onSubmit, disabled }: EditorProps) => {
+const Editor = ({
+  variant = "create",
+  placeholder,
+  onCancel,
+  onSubmit,
+  disabled,
+  innerRef,
+}: EditorProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const quillRef = useRef<Quill | null>(null);
 
-  const placeholderRef = useRef< string | null >(null);
-  const onSumbmitRef = useRef< () => void | null >(null);
-  const onCancelRef = useRef< () => void | null >(null);
-  const disabeldRef = useRef< boolean | null >(null)
-  
+  const placeholderRef = useRef<string | null>(null);
+  const onSumbmitRef =
+    useRef<(value: Delta, elem: HTMLInputElement) => void | null>(null);
+  const onCancelRef = useRef<() => void | null>(null);
+  const disabeldRef = useRef<boolean | null>(null);
+  const imageELementRef = useRef<HTMLInputElement | null>(null);
+
+  const [IMG, setIMG] = useState<File | null>(null);
   const [Value, setValue] = useState("");
-  const [IsToolBarVisible, setIsToolBarVisible] = useState(true)
+  const [IsToolBarVisible, setIsToolBarVisible] = useState(true);
 
   function HandleValueChange() {
     if (!quillRef.current) return;
@@ -35,18 +49,35 @@ const Editor = ({ variant = "create", placeholder, onCancel, onSubmit, disabled 
     setValue(Text);
   }
 
-  function ToggleToolbar(){
-    if(!containerRef.current) return;
-    setIsToolBarVisible(prev => !prev)
-    containerRef.current?.querySelector('.ql-toolbar')?.classList?.toggle('hidden')
+  function ToggleToolbar() {
+    if (!containerRef.current) return;
+    setIsToolBarVisible((prev) => !prev);
+    containerRef.current
+      ?.querySelector(".ql-toolbar")
+      ?.classList?.toggle("hidden");
+  }
+
+  function HandleEmojiInput(emoji: { native: string }) {
+    if (!quillRef.current) return;
+    quillRef.current.insertText(
+      quillRef.current.getSelection()?.index || 0,
+      emoji.native
+    );
   }
 
   useLayoutEffect(() => {
-    placeholderRef.current = placeholder
-    onSumbmitRef.current = onSubmit
-    onCancelRef.current = onCancel
-    disabeldRef.current = disabled
-  })
+    placeholderRef.current = placeholder;
+    onSumbmitRef.current = onSubmit;
+    onCancelRef.current = onCancel;
+    disabeldRef.current = disabled;
+  });
+
+ function HandleSubmit() {
+  if (!quillRef.current) return;
+  onSumbmitRef?.current?.(quillRef.current.getContents(), imageELementRef.current);
+
+}
+
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -59,63 +90,101 @@ const Editor = ({ variant = "create", placeholder, onCancel, onSubmit, disabled 
 
     const options: QuillOptions = {
       theme: "snow",
-      placeholder:placeholderRef.current!,
-      modules:{
-        toolbar:[
-          ['bold','italic','strike'],
-          ['link'],
-          [{list:'ordered'},{list:'bullet'}]
+      placeholder: placeholderRef.current!,
+      modules: {
+        toolbar: [
+          ["bold", "italic", "strike"],
+          ["link"],
+          [{ list: "ordered" }, { list: "bullet" }],
         ],
-        keyboard:{
-          bindings:{
-            enter:{
-              key:'Enter',
-              handler:() => {
-                // TODO : Call the onSubmint fnc
-                return;
-              }
+        keyboard: {
+          bindings: {
+            enter: {
+              key: "Enter",
+              handler: HandleSubmit,
             },
-          }
-        }
-      }
+          },
+        },
+      },
     };
 
     const quill = new Quill(editorContainer, options);
     quillRef.current = quill;
+    innerRef.current = quill;
     quill.on(Quill.events.TEXT_CHANGE, HandleValueChange);
-    quill.focus()
+    quill.focus();
 
     return () => {
-      quill.off(Quill.events.TEXT_CHANGE)
+      quill.off(Quill.events.TEXT_CHANGE);
       if (container) {
         container.innerHTML = "";
       }
-      if(quillRef.current){
+      if (quillRef.current) {
         quillRef.current = null;
       }
     };
   }, []);
 
-  const ValueEmpty = Value.replace(/<(.|\n)*?>/g, "").trim().length == 0;
+
+  const ValueEmpty =
+    !IMG && Value.replace(/<(.|\n)*?>/g, "").trim().length == 0;
 
   return (
     <div className="flex flex-col pr-4">
+      <input
+        ref={imageELementRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            setIMG(file);
+          }
+        }}
+      />
+
       <div className="flex flex-col border-slate-200 rounded-md overflow-hidden focus-within:border-slate-300 focus-within:shadow-sm transition bg-white">
         <div ref={containerRef} className="h-full ql-custom" />
+        {IMG && (
+          <div className="image-element p-2">
+            <div className="size-16 rounded-sm overflow-hidden relative group">
+              <Image
+                src={URL.createObjectURL(IMG)}
+                alt="Selected Image"
+                fill
+                className="object-cover"
+              />
+              <div
+                onClick={() => {
+                  setIMG(null);
+                }}
+                className="absolute top-1 right-1 w-5 h-5 bg-black text-white rounded-full leading-none text-center opacity-0 group-hover:opacity-100 transition flex justify-center items-center cursor-pointer"
+              >
+                <XIcon className="size-4" />
+              </div>
+            </div>
+          </div>
+        )}
         <div className="tools flex p-2 z-[5]">
-          <Hint label={IsToolBarVisible ? 'Hide-Formatting' : 'Show-Formatting'}>
+          <Hint
+            label={IsToolBarVisible ? "Hide-Formatting" : "Show-Formatting"}
+          >
             <Button onClick={ToggleToolbar} variant="ghost">
               <PiTextAa className="size-4" />
             </Button>
           </Hint>
-          <Hint label="Emoji">
+          <EmojiPopover onEmojiSelect={HandleEmojiInput} label="Emoji">
             <Button variant="ghost">
               <Smile className="size-4" />
             </Button>
-          </Hint>
+          </EmojiPopover>
           {variant == "create" && (
             <Hint label="Image">
-              <Button variant="ghost">
+              <Button
+                onClick={() => imageELementRef?.current?.click()}
+                variant="ghost"
+              >
                 <ImageIcon className="size-4" />
               </Button>
             </Hint>
@@ -128,9 +197,10 @@ const Editor = ({ variant = "create", placeholder, onCancel, onSubmit, disabled 
               </Button>
             </div>
           )}
-           {variant == "create" && (
+          {variant == "create" && (
             <Hint label="Send">
               <Button
+                onClick={HandleSubmit}
                 disabled={disabled || ValueEmpty}
                 className="ml-auto bg-slate-700 hover:bg-slate-700 transition"
               >
@@ -138,10 +208,14 @@ const Editor = ({ variant = "create", placeholder, onCancel, onSubmit, disabled 
               </Button>
             </Hint>
           )}
-
         </div>
       </div>
-      <div className="flex justify-end text-[10px] text-muted-foreground p-2">
+      <div
+        className={cn(
+          "flex justify-end text-[10px] text-muted-foreground p-2 transition",
+          ValueEmpty && "opacity-0"
+        )}
+      >
         <strong>Shift + Enter</strong>&nbsp;to add a new line
       </div>
     </div>

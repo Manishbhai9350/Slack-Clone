@@ -4,22 +4,26 @@ import { useCallback, useMemo, useState } from "react";
 import { Id } from "../../../../convex/_generated/dataModel";
 
 interface mutateOptions {
-  onSuccess?: (Response:boolean) => void;
+  onSuccess?: (Response:Id<'messages'>) => void;
   onError?: (error:Error) => void;
   onSetteled?: () => void;
   throwError?:boolean;
 }
 
 interface mutateValues {
-  id:Id<'workspaces'>;
+  message:string;
+  workspace:Id<'workspaces'>,
+  channel?:Id<'channels'>,
+  image?:Id<'_storage'>,
+  parent?:Id<'messages'>
 }
 
 type stateTypes = "pending" | "success" | "error" | "setteled" | "";
 
-export const useRemoveWorkSpace = () => {
-  const mutation = useMutation(api.workspaces.remove);
+export const useCreateMessage = () => {
+  const mutation = useMutation(api.messages.create);
 
-  const [Data, setData] = useState<boolean | null>(null)
+  const [Data, setData] = useState<Id<'messages'> | null>(null)
   const [state, setState] = useState<stateTypes>("");
 
   const IsPending = useMemo(() => state == 'pending',[state])

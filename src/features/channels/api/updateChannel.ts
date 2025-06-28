@@ -34,8 +34,7 @@ export const useUpdateChannel = () => {
       try {
         setData(null)
         setState('pending')
-        const { id, name } = values;
-        const Response = await mutation({ id,name });
+        const Response = await mutation(values);
         setData(Response)
         setState('success')
         options?.onSuccess?.(Response)

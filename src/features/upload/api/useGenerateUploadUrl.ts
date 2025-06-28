@@ -1,25 +1,20 @@
 import { useMutation } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { useCallback, useMemo, useState } from "react";
-import { Id } from "../../../../convex/_generated/dataModel";
 
 interface mutateOptions {
-  onSuccess?: (Response:boolean) => void;
+  onSuccess?: (Response:string) => void;
   onError?: (error:Error) => void;
   onSetteled?: () => void;
   throwError?:boolean;
 }
 
-interface mutateValues {
-  id:Id<'workspaces'>;
-}
-
 type stateTypes = "pending" | "success" | "error" | "setteled" | "";
 
-export const useRemoveWorkSpace = () => {
-  const mutation = useMutation(api.workspaces.remove);
+export const useGenerateUploadUrl = () => {
+  const mutation = useMutation(api.upload.GenerateUploadUrl);
 
-  const [Data, setData] = useState<boolean | null>(null)
+  const [Data, setData] = useState<string | null>(null)
   const [state, setState] = useState<stateTypes>("");
 
   const IsPending = useMemo(() => state == 'pending',[state])
@@ -29,11 +24,11 @@ export const useRemoveWorkSpace = () => {
 
 
   const mutate = useCallback(
-    async (values: mutateValues, options?: mutateOptions) => {
+    async (values: null, options?: mutateOptions) => {
       try {
         setData(null)
         setState('pending')
-        const Response = await mutation(values);
+        const Response = await mutation();
         setData(Response)
         setState('success')
         options?.onSuccess?.(Response)
