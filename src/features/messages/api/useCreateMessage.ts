@@ -14,8 +14,9 @@ interface mutateValues {
   message:string;
   workspace:Id<'workspaces'>,
   channel?:Id<'channels'>,
+  parent?:Id<'messages'>,
   image?:Id<'_storage'>,
-  parent?:Id<'messages'>
+  conversation?:Id<'conversations'>,
 }
 
 type stateTypes = "pending" | "success" | "error" | "setteled" | "";

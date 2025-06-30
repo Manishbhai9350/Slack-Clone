@@ -7,6 +7,7 @@ import { useGetChannels } from "@/features/channels/api/useGetChannels";
 import UseCurrentMember from "../api/useCurrentMember";
 import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import { useGetMessages } from "@/features/messages/api/useGetMessages";
 
 const WorkSpacePage = () => {
   const workspaceId = useGetWorkspaceId();
@@ -23,6 +24,7 @@ const WorkSpacePage = () => {
   const { Data: Member, IsLoading: MemberLoading } = UseCurrentMember({
     workspaceId,
   });
+
 
   const Router = useRouter()
 
