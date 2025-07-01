@@ -1,7 +1,7 @@
 'use client'
 
 import Quill,{ QuillOptions } from "quill";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 
 interface RendererProps {
@@ -12,8 +12,9 @@ const Renderer = ({content}:RendererProps) => {
   
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const [isEmpty, setIsEmpty] = useState(false)
+
   useEffect(() => {
-    console.log(containerRef.current)
     if (!containerRef.current) return;
 
     const container = containerRef.current!;
@@ -27,6 +28,8 @@ const Renderer = ({content}:RendererProps) => {
     quill.setContents(JSON.parse(content))
     quill.disable()
 
+    setIsEmpty(quill && quill.getText().replace(/<(.|\n)*?>/g, "").trim().length == 0);
+
     container.innerHTML = quill.root.innerHTML
 
     return () => {
@@ -35,6 +38,10 @@ const Renderer = ({content}:RendererProps) => {
       }
     };
   }, [content]);
+
+  if(isEmpty) {
+    return null;
+  }
 
   return (
     <div

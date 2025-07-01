@@ -171,3 +171,11 @@ html,body,:root {
   font-weight: 400 !important;
   @apply truncate;
 }
+
+::-webkit-scrollbar {
+  display:none;
+}
+
+.messages-container {
+  scrollbar-width: 0;
+}

@@ -75,7 +75,6 @@ const Editor = ({
  function HandleSubmit() {
   if (!quillRef.current) return;
   onSumbmitRef?.current?.(quillRef.current.getContents(), imageELementRef.current);
-
 }
 
 
@@ -125,6 +124,18 @@ const Editor = ({
     };
   }, []);
 
+  useEffect(() => {
+    if(disabled) {
+      quillRef.current?.disable(true)
+    } else {
+      quillRef.current?.enable(true)
+    }
+    return () => {
+      
+    }
+  }, [disabled])
+  
+
 
   const ValueEmpty =
     !IMG && Value.replace(/<(.|\n)*?>/g, "").trim().length == 0;
@@ -157,6 +168,7 @@ const Editor = ({
               />
               <div
                 onClick={() => {
+                  if(disabled) return;
                   setIMG(null);
                 }}
                 className="absolute top-1 right-1 w-5 h-5 bg-black text-white rounded-full leading-none text-center opacity-0 group-hover:opacity-100 transition flex justify-center items-center cursor-pointer"

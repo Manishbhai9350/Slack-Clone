@@ -13,7 +13,8 @@ const ChatInput = () => {
   const workspaceId = useGetWorkspaceId();
   const channelId = useGetChannelId();
 
-  const [ForceRenderCount, setForceRenderCount] = useState(0)
+  const [ForceRenderCount, setForceRenderCount] = useState(0);
+  const [Disabled, setDisabled] = useState(false);
 
   const InnerRef = useRef<Quill | null>(null);
 
@@ -21,15 +22,13 @@ const ChatInput = () => {
   const { mutate: GenerateUploadUrl, IsPending: IsGeneratingUploadUrl } =
     useGenerateUploadUrl();
 
-  async function HandleSubmit(value: Delta, ImageInput:HTMLInputElement) {
-
-    const image = ImageInput?.files[0]
+  async function HandleSubmit(value: Delta, ImageInput: HTMLInputElement) {
+    const image = ImageInput?.files[0];
 
     if (!InnerRef.current || (!value && !image)) return;
+    setDisabled(true);
 
     const StringValue = JSON.stringify(value);
-
-    console.log(value,image)
 
     const Values = {
       message: StringValue,
@@ -41,16 +40,20 @@ const ChatInput = () => {
     if (image) {
       const url = await GenerateUploadUrl(null)!;
       if (url) {
-        const result = await fetch(url, {
-          method: "POST",
-          headers: {
-            "Content-Type": image.type,
-          },
-          body: image,
-        });
+        try {
+          const result = await fetch(url, {
+            method: "POST",
+            headers: {
+              "Content-Type": image.type,
+            },
+            body: image,
+          });
 
-        const { storageId } = await result.json();
-        Values.image = storageId;
+          const { storageId } = await result.json();
+          Values.image = storageId;
+        } catch (error) {
+          
+        }
       }
     }
 
@@ -63,8 +66,9 @@ const ChatInput = () => {
         toast.success("Failed To Send Message");
       },
       onSetteled() {
-        ImageInput.value = null
-        setForceRenderCount(prev => prev + 1)
+        setDisabled(false);
+        ImageInput.value = null;
+        setForceRenderCount((prev) => prev + 1);
       },
     });
   }
@@ -74,7 +78,7 @@ const ChatInput = () => {
       <Editor
         key={ForceRenderCount}
         innerRef={InnerRef}
-        disabled={IsPending || IsGeneratingUploadUrl}
+        disabled={Disabled || IsPending || IsGeneratingUploadUrl}
         placeholder="Type Something...."
         onCancel={() => {}}
         onSubmit={HandleSubmit}

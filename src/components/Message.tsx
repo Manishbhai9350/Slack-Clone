@@ -2,12 +2,14 @@ import dynamic from "next/dynamic";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { format, isToday, isYesterday } from "date-fns";
 import Hint from "./Hint";
+import Thumbnail from "./Thumbnail";
 
 const Renderer = dynamic(() => import("./Renderer"));
 
 interface MessageProps {
   content: string; // Pass Quill Delta
   isCompact: boolean;
+  image: string;
   authorName: string;
   authorImage: string | null;
   creationTime: number;
@@ -22,7 +24,9 @@ const Message = ({
   authorImage,
   authorName,
   creationTime,
+  image,
 }: MessageProps) => {
+
   if (!isCompact) {
     return (
       <div className="p-2 flex items-start gap-2 hover:bg-slate-100 transition relative group">
@@ -40,27 +44,33 @@ const Message = ({
         </div>
         <div className="flex flex-col">
           <div className="name-time flex items-center gap-2">
-            <h1 className="font-bold text-black">Meow Meow</h1>
+            <h1 className="font-bold text-xl text-black">{authorName}</h1>
             <Hint label={FormatFullTime(new Date(creationTime))}>
-              <p className="text-muted-foreground text-xs opacity-0 group-hover:opacity-100">
+              <p className="text-muted-foreground cursor-pointer text-xs opacity-0 group-hover:opacity-100">
                 {format(new Date(creationTime), "h:mm a")}
               </p>
             </Hint>
           </div>
-          <Renderer content={content} />
+          <div className="flex flex-col gap-2">
+            <Renderer content={content} />
+            {image && <Thumbnail url={image} />}
+          </div>
         </div>
       </div>
     );
   } else {
     return (
       <div className="p-2 flex items-start gap-2 hover:bg-slate-100 transition relative group">
-        <div className="logo-or flex gap-2 h-full justify-center items-center">
+        <div className="flex gap-2 h-full justify-center items-center pt-2">
           <Hint label={FormatFullTime(new Date(creationTime))}>
-            <p className="text-muted-foreground text-xs text-center w-12 opacity-0 group-hover:opacity-100">
+            <p className="text-muted-foreground cursor-pointer text-xs text-center w-12 opacity-0 group-hover:opacity-100">
               {format(new Date(creationTime), "h:mm a")}
             </p>
           </Hint>
+        </div>
+        <div className="flex flex-col gap-2">
           <Renderer content={content} />
+          {image && <Thumbnail url={image} />}
         </div>
       </div>
     );

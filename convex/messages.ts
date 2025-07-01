@@ -4,7 +4,7 @@ import { v } from "convex/values";
 import { mutation, query, QueryCtx } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { Doc, Id } from "./_generated/dataModel";
-import { paginationOptsValidator } from "convex/server";
+import { paginationOptsValidator, } from "convex/server";
 
 interface Threads {
   count: number;
@@ -175,8 +175,15 @@ export const get = query({
           user = await populateUser(Member.user, ctx);
         }
 
+        let img = ''
+        if(message.image) {
+          const ImageUrl = await ctx.storage.getUrl(message.image)
+          img = ImageUrl || ''
+        }
+
         return {
           ...message,
+          img,
           reactions,
           user,
         };
