@@ -4,12 +4,24 @@ import { useGenerateUploadUrl } from "@/features/upload/api/useGenerateUploadUrl
 import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId";
 import dynamic from "next/dynamic";
 import Quill, { Delta } from "quill";
-import { useRef, useState } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
 import { toast } from "sonner";
+import { Id } from "../../../../convex/_generated/dataModel";
 
 const Editor = dynamic(() => import("@/components/Editor"), { ssr: false });
 
-const ChatInput = () => {
+interface ChatInputProps {
+  updatePending:boolean;
+  isEdit:null | Id<'messages'>;
+  editValue: string;
+  onUpdate:(value:string) => void;
+  onUpdateCancel:() => void;
+  setIsCreating: Dispatch<SetStateAction<boolean>>;
+  IsCreating:boolean;
+}
+
+
+const ChatInput = ({isEdit,editValue,onUpdate,onUpdateCancel,updatePending,IsCreating,setIsCreating}:ChatInputProps) => {
   const workspaceId = useGetWorkspaceId();
   const channelId = useGetChannelId();
 
@@ -23,10 +35,17 @@ const ChatInput = () => {
     useGenerateUploadUrl();
 
   async function HandleSubmit(value: Delta, ImageInput: HTMLInputElement) {
+    if (IsCreating || !InnerRef.current || (!value && !image)) return;
+
+    if(isEdit) {
+      onUpdate(JSON.stringify(value))
+      return;
+    }
+
     const image = ImageInput?.files[0];
 
-    if (!InnerRef.current || (!value && !image)) return;
     setDisabled(true);
+    setIsCreating(true)
 
     const StringValue = JSON.stringify(value);
 
@@ -69,6 +88,7 @@ const ChatInput = () => {
         setDisabled(false);
         ImageInput.value = null;
         setForceRenderCount((prev) => prev + 1);
+        setIsCreating(false)
       },
     });
   }
@@ -76,11 +96,14 @@ const ChatInput = () => {
   return (
     <div className="w-full p-2">
       <Editor
+        variant={isEdit ? 'update' : 'create'}
+        updateValue={editValue}
+        isEdit={isEdit}
         key={ForceRenderCount}
         innerRef={InnerRef}
-        disabled={Disabled || IsPending || IsGeneratingUploadUrl}
+        disabled={Disabled || updatePending || IsPending || IsGeneratingUploadUrl}
         placeholder="Type Something...."
-        onCancel={() => {}}
+        onCancel={onUpdateCancel}
         onSubmit={HandleSubmit}
       />
     </div>

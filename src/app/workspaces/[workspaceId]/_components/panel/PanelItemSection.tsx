@@ -38,7 +38,10 @@ const PanelItemSection = ({
         {label && toggle ? (
           <div
             onClick={Toggle}
-            className="w-fit gap-2 rounded-xs cursor-pointer transition-all duration-300 flex px-2 py-1 items-center justify-start hover:bg-white/70 hover:text-slate-800 text-white"
+            className={cn(
+              'w-fit gap-2 rounded-xs cursor-pointer transition-all duration-300 flex px-2 py-1 items-center  justify-start hover:bg-white/70 hover:text-slate-800 text-white',
+              on && 'my-2'
+            )}
           >
             <FaCaretDown
               className={cn(

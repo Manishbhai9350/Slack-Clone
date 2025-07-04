@@ -1,5 +1,5 @@
 import Quill, { Delta, QuillOptions } from "quill";
-import { Ref, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Dispatch, Ref, SetStateAction, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { Smile, ImageIcon, XIcon } from "lucide-react";
 import { PiTextAa } from "react-icons/pi";
@@ -11,14 +11,17 @@ import Hint from "./Hint";
 import EmojiPopover from "./EmojiPopover";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { Id } from "../../convex/_generated/dataModel";
 
 interface EditorProps {
   variant?: "create" | "update";
-  onSubmit: (value: Delta, elem:HTMLInputElement) => void;
+  onSubmit: (value: Delta, elem: HTMLInputElement) => void;
   onCancel: () => void;
   placeholder: string;
   disabled: boolean;
   innerRef: Ref;
+  isEdit: null | Id<"messages">;
+  updateValue: string;
 }
 
 const Editor = ({
@@ -28,6 +31,7 @@ const Editor = ({
   onSubmit,
   disabled,
   innerRef,
+  updateValue
 }: EditorProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const quillRef = useRef<Quill | null>(null);
@@ -72,11 +76,13 @@ const Editor = ({
     disabeldRef.current = disabled;
   });
 
- function HandleSubmit() {
-  if (!quillRef.current) return;
-  onSumbmitRef?.current?.(quillRef.current.getContents(), imageELementRef.current);
-}
-
+  function HandleSubmit() {
+    if (!quillRef.current) return;
+    onSumbmitRef?.current?.(
+      quillRef.current.getContents(),
+      imageELementRef.current
+    );
+  }
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -125,17 +131,22 @@ const Editor = ({
   }, []);
 
   useEffect(() => {
-    if(disabled) {
-      quillRef.current?.disable(true)
+    if (disabled) {
+      quillRef.current?.disable(true);
     } else {
-      quillRef.current?.enable(true)
+      quillRef.current?.enable(true);
     }
-    return () => {
-      
-    }
-  }, [disabled])
-  
+    return () => {};
+  }, [disabled]);
 
+  useEffect(() => {
+    if (variant == "update") {
+      quillRef.current?.setContents(JSON.parse(updateValue));
+      quillRef.current?.focus();
+      return;
+    }
+    quillRef.current?.setContents(null);
+  }, [updateValue, variant]);
 
   const ValueEmpty =
     !IMG && Value.replace(/<(.|\n)*?>/g, "").trim().length == 0;
@@ -168,7 +179,7 @@ const Editor = ({
               />
               <div
                 onClick={() => {
-                  if(disabled) return;
+                  if (disabled) return;
                   setIMG(null);
                 }}
                 className="absolute top-1 right-1 w-5 h-5 bg-black text-white rounded-full leading-none text-center opacity-0 group-hover:opacity-100 transition flex justify-center items-center cursor-pointer"
@@ -203,8 +214,18 @@ const Editor = ({
           )}
           {variant == "update" && (
             <div className="ml-auto flex gap-2">
-              <Button variant="outline">Cancel</Button>
-              <Button className="bg-slate-700 hover:bg-slate-700 transition">
+              <Button
+                disabled={disabled || ValueEmpty}
+                onClick={onCancel}
+                variant="outline"
+              >
+                Cancel
+              </Button>
+              <Button
+                disabled={disabled || ValueEmpty}
+                onClick={HandleSubmit}
+                className="bg-slate-700 hover:bg-slate-700 transition"
+              >
                 Update
               </Button>
             </div>

@@ -183,6 +183,7 @@ export const get = query({
 
         return {
           ...message,
+          member:Member,
           img,
           reactions,
           user,
@@ -276,3 +277,82 @@ export const getByChannel = query({
     // const Reactions = await ctx.db.query('reactions')
   },
 });
+
+
+
+export const update = mutation({
+  args:{
+    message:v.id('messages'),
+    value:v.string()
+  },
+  handler:async (ctx,args) => {
+    const UserId = await getAuthUserId(ctx);
+    if(!UserId) {
+      throw new Error('Unauthorized')
+    }
+
+    const Message = await ctx.db.get(args.message)
+
+    if(!Message) {
+      throw new Error('Message Not Found')
+    }
+    
+    const CurrentMember = await ctx.db.query('members').withIndex('by_user',q => q.eq('user',UserId)).unique()
+
+    if(!CurrentMember) {
+      throw new Error('Member Not Found')
+    }
+
+    if(Message.member !== CurrentMember._id){
+      throw new Error('Unauthorized')
+    }
+
+    await ctx.db.patch(args.message,{
+      message:args.value,
+      updated:Date.now()
+    });
+
+    return args.message;
+  }
+})
+
+
+
+export const remove =  mutation({
+  args:{
+    message:v.id('messages')
+  },
+  handler:async (ctx,args) => {
+    const UserId = await getAuthUserId(ctx);
+    if(!UserId) {
+      throw new Error('Unauthorized')
+    }
+
+    const Message = await ctx.db.get(args.message)
+
+    if(!Message) {
+      throw new Error('Message Not Found')
+    }
+    
+    const CurrentMember = await ctx.db.query('members').withIndex('by_user',q => q.eq('user',UserId)).unique()
+
+    if(!CurrentMember) {
+      throw new Error('Member Not Found')
+    }
+
+    if(Message.member !== CurrentMember._id){
+      throw new Error('Unauthorized')
+    }
+
+    // Removing Associated Image
+    if(Message.image){
+      await ctx.storage.delete(Message.image)
+    }
+
+
+    // Deleting The Message
+    await ctx.db.delete(Message._id);
+
+    return args.message;
+  }
+})

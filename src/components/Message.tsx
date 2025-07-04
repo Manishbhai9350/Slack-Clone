@@ -3,29 +3,55 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { format, isToday, isYesterday } from "date-fns";
 import Hint from "./Hint";
 import Thumbnail from "./Thumbnail";
+import Toolbar from "./Toolbar";
+import { Id } from "../../convex/_generated/dataModel";
+import { Dispatch, SetStateAction } from "react";
 
 const Renderer = dynamic(() => import("./Renderer"));
 
 interface MessageProps {
+  id: Id<"messages">;
+  isEdit: null | Id<"messages">;
+  setEditValue: Dispatch<SetStateAction<string>>;
+  setEdit: Dispatch<SetStateAction<Id<"messages"> | null>>;
+  setIsCreating: Dispatch<SetStateAction<boolean>>;
+  IsCreating: boolean;
   content: string; // Pass Quill Delta
+  isAuthor: boolean;
   isCompact: boolean;
   image: string;
   authorName: string;
   authorImage: string | null;
   creationTime: number;
+  updated: number | null;
 }
 
 const FormatFullTime = (date: Date) =>
   `${isToday(date) ? "Today" : isYesterday(date) ? "Yesterday" : format(date, "MMM, d, yyyy")} At ${format(date, "h:mm a")}`;
 
 const Message = ({
+  id,
   content,
   isCompact = false,
   authorImage,
   authorName,
   creationTime,
   image,
+  isAuthor,
+  setEditValue,
+  isEdit,
+  setEdit,
+  IsCreating,
+  updated,
+  setIsCreating,
 }: MessageProps) => {
+
+  
+  function HandleOnEdit() {
+    if (IsCreating) return;
+    setEditValue(content);
+    setEdit(id);
+  }
 
   if (!isCompact) {
     return (
@@ -54,8 +80,15 @@ const Message = ({
           <div className="flex flex-col gap-2">
             <Renderer content={content} />
             {image && <Thumbnail url={image} />}
+            {updated && <p className="text-sm text-muted-foreground">Edited</p>}
           </div>
         </div>
+        <Toolbar
+          message={id}
+          isEdit={isEdit}
+          onEdit={HandleOnEdit}
+          isAuthor={isAuthor}
+        />
       </div>
     );
   } else {
@@ -71,7 +104,15 @@ const Message = ({
         <div className="flex flex-col gap-2">
           <Renderer content={content} />
           {image && <Thumbnail url={image} />}
+          {updated && <p className="text-sm text-muted-foreground">Edited</p>}
         </div>
+        <Toolbar
+          message={id}
+          isCompact
+          isEdit={isEdit}
+          onEdit={HandleOnEdit}
+          isAuthor={isAuthor}
+        />
       </div>
     );
   }

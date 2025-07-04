@@ -4,7 +4,7 @@ import { useGetChannels } from "@/features/channels/api/useGetChannels";
 import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId";
 import { Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useGetChannelId } from "@/features/channels/hooks/useChannelId";
 import Header from "./_components/Header";
 import { useGetChannel } from "@/features/channels/api/useGetChannel";
@@ -13,12 +13,21 @@ import { useGetMessages } from "@/features/messages/api/useGetMessages";
 import { groupMessagesByDate } from "@/lib/message.lib";
 import Message from "@/components/Message";
 import {differenceInSeconds} from 'date-fns';
+import UseCurrentMember from "@/features/workspace/api/useCurrentMember";
+import { useUpdateMessage } from "@/features/messages/api/useUpdateMessage";
+import { Id } from "../../../../../../convex/_generated/dataModel";
+import { toast } from "sonner";
 
-const TIME_THRESHOLD = 20;
+const TIME_THRESHOLD = 30;
 
 const ChannelPage = () => {
   const workspaceId = useGetWorkspaceId();
   const channelId = useGetChannelId();
+
+  const [IsEdit, setIsEdit] = useState<Id<'messages'> | null>(null)
+  const [EditValue, setEditValue] = useState<string>('')
+
+  const [IsCreating, setIsCreating] = useState(false)
 
   const { Data: Channels, IsLoading: ChannelsLoading } = useGetChannels({
     workspaceId,
@@ -26,6 +35,9 @@ const ChannelPage = () => {
   const { Data: ChannelData, IsLoading: ChannelDataLoading } = useGetChannel({
     id: channelId,
   });
+  const {Data:CurrentMember, IsLoading:CurrentMemberLoading} = UseCurrentMember({workspaceId:workspaceId})
+
+  const {mutate:UpdateMessage,IsPending:UpdatingMessage} = useUpdateMessage()
 
   const { messages } = useGetMessages({ channel: channelId });
 
@@ -34,6 +46,29 @@ const ChannelPage = () => {
   const Router = useRouter();
 
   const Channel = useMemo(() => Channels?.[0]?._id, [Channels]);
+
+
+  function HandleUpdate(value:string){
+    if(!value || value.length == 0 || !IsEdit) return;
+    UpdateMessage({
+      value,
+      message:IsEdit
+    },{
+      onSuccess(){
+        toast.success('Message Updated Successfully')
+        HandleUpdateCancel()
+      },
+      onError(){
+        toast.error('Failed To Update Message')
+      },
+      throwError:true
+    })
+  }
+
+  function HandleUpdateCancel(){
+    setIsEdit(null)
+    setEditValue('')
+  }
 
   useEffect(() => {
     if (ChannelsLoading) return;
@@ -71,14 +106,21 @@ const ChannelPage = () => {
                     {group.reverse().map((msg, i) => {
                       const PrevMessage = group[i - 1];
                       const isCompact =
-                        PrevMessage && PrevMessage.member == msg.member && (
+                        PrevMessage && PrevMessage?.member?.id == msg?.member?.id && (
                           differenceInSeconds(
                             new Date(msg._creationTime),
                             new Date(PrevMessage._creationTime),
                           ) < TIME_THRESHOLD
-                        );
+                        )
                       return (
                         <Message
+                          id={msg!._id}
+                          IsCreating={IsCreating}
+                          setIsCreating={setIsCreating}
+                          setEditValue={setEditValue}
+                          isEdit={IsEdit}
+                          setEdit={setIsEdit}
+                          isAuthor={msg?.member?._id == CurrentMember?._id}
                           image={msg.img}
                           creationTime={msg._creationTime}
                           isCompact={isCompact}
@@ -86,6 +128,7 @@ const ChannelPage = () => {
                           authorImage={msg?.user?.image}
                           key={msg._creationTime}
                           content={msg.message}
+                          updated={msg.updated}
                         />
                       );
                     })}
@@ -95,7 +138,7 @@ const ChannelPage = () => {
             })}
         </div>
       </div>
-      <ChatInput />
+      <ChatInput IsCreating={IsCreating} setIsCreating={setIsCreating} updatePending={UpdatingMessage} onUpdateCancel={HandleUpdateCancel} onUpdate={HandleUpdate} isEdit={IsEdit} editValue={EditValue} />
     </div>
   );
 };
