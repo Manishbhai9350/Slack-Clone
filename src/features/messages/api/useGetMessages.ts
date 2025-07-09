@@ -26,7 +26,7 @@ export const useGetMessages = ({
 
   return {
     messages: results ?? [],
-    loadMore,
+    loadMore: () => loadMore(INITIAL_SIZE),
     isLoading,
     isEmpty,
     status, // optional if you want to use it outside

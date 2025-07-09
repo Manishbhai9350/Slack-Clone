@@ -4,7 +4,7 @@ import { v } from "convex/values";
 import { mutation, query, QueryCtx } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { Doc, Id } from "./_generated/dataModel";
-import { paginationOptsValidator, } from "convex/server";
+import { paginationOptsValidator } from "convex/server";
 
 interface Threads {
   count: number;
@@ -12,42 +12,6 @@ interface Threads {
   timestamp: number;
 }
 
-type ReactionSummary = {
-  value: string;
-  count: number;
-};
-
-export const populateReactions = async (
-  messageId: Id<"messages">,
-  ctx: QueryCtx
-): Promise<ReactionSummary[]> => {
-  const reactions = await ctx.db
-    .query("reactions")
-    .withIndex("by_message", (q) => q.eq("message", messageId))
-    .collect();
-
-  // Map to track unique reactions: Map<`${memberId}_${value}`, true>
-  const uniqueMap = new Map<string, boolean>();
-  const countMap = new Map<string, number>();
-
-  for (const reaction of reactions) {
-    const key = `${reaction.member}_${reaction.value}`;
-    if (!uniqueMap.has(key)) {
-      uniqueMap.set(key, true);
-      countMap.set(reaction.value, (countMap.get(reaction.value) || 0) + 1);
-    }
-  }
-
-  // Convert to array
-  const result: ReactionSummary[] = Array.from(countMap.entries()).map(
-    ([value, count]) => ({
-      value,
-      count,
-    })
-  );
-
-  return result;
-};
 
 const populateThread = async (
   id: Id<"messages">,
@@ -91,6 +55,12 @@ const populateThread = async (
   return ThreadData;
 };
 
+
+const populateReactions = async ({message,ctx}:{message:Id<"messages">,ctx:QueryCtx}) => {
+  const reactions = await ctx.db.query('reactions').withIndex('by_message',q => q.eq('message',message)).collect();
+  return reactions
+}
+
 const populateUser = (
   id: Id<"users">,
   ctx: QueryCtx
@@ -126,8 +96,6 @@ const getMember = (
 };
 
 
-
-
 export const get = query({
   args: {
     channel: v.optional(v.string()),
@@ -154,7 +122,7 @@ export const get = query({
       }
     }
 
-    const messagesPage = await ctx.db
+    const results = await ctx.db
       .query("messages")
       .withIndex("by_channel_parent_conversation", (q) =>
         q
@@ -165,40 +133,75 @@ export const get = query({
       .order("desc")
       .paginate(args.paginationOpts); // 👈 Keep as-is
 
-    const hydratedPage = await Promise.all(
-      messagesPage.page.map(async (message) => {
-        const reactions = await populateReactions(message._id, ctx);
+      return {
+        ...results,
+        page:(
+          await Promise.all(
+            results.page.map(async (message) => {
+              const member = await populateMember(message.member,ctx)
+              const user = member ? await populateUser(member.user,ctx) : null;
 
-        let user = null;
-        const Member = await populateMember(message.member, ctx);
-        if (Member) {
-          user = await populateUser(Member.user, ctx);
-        }
+              if(!member || !user) {
+                return null;
+              }
 
-        let img = ''
-        if(message.image) {
-          const ImageUrl = await ctx.storage.getUrl(message.image)
-          img = ImageUrl || ''
-        }
+              const reactions = await populateReactions({ctx,message:message._id});
+              const thread = await populateThread(message._id,ctx)
 
-        return {
-          ...message,
-          member:Member,
-          img,
-          reactions,
-          user,
-        };
-      })
-    );
+              let image;
 
-    // ✅ Must return the pagination object
-    return {
-      ...messagesPage,
-      page: hydratedPage, // Replace original page with hydrated data
-    };
+              if(message.image) {
+                image = await ctx.storage.getUrl(message.image)
+              }
+
+              const EachReactionsWithCount = reactions.map(reaction => {
+                return {
+                  ...reaction,
+                  count:reactions.filter(r => r.value === reaction.value).length
+                }
+              })
+
+              const FilteredReactions = EachReactionsWithCount.reduce(
+                (acc,reaction) => {
+
+                  const ExistingReaction = acc.find(r => r.value == reaction.value)
+
+                  if(ExistingReaction) {
+                    ExistingReaction.memberIds = Array.from(
+                      new Set([...ExistingReaction.memberIds,reaction.member])
+                    )
+                  } else {
+                    acc.push({...reaction,memberIds:[reaction.member]})
+                  }
+
+                  return acc;
+
+              },[] as (Doc<'reactions'> & {
+                count:number;
+                memberIds:Id<'members'>[];
+              })[]
+            );
+
+            const ReactionsWithoutMembers = FilteredReactions.map(({member,...rest}) => rest);
+
+            return {
+              ...message,
+              image,
+              member,
+              user,
+              reactions:ReactionsWithoutMembers,
+              threadCount:thread.count,
+              threadImage:thread.image,
+              threadTimestamp:thread.timestamp
+            }
+
+            })
+          )
+        ).filter((message) => message !== null)
+      }
+
   },
 });
-
 
 export const create = mutation({
   args: {
@@ -278,81 +281,82 @@ export const getByChannel = query({
   },
 });
 
-
-
 export const update = mutation({
-  args:{
-    message:v.id('messages'),
-    value:v.string()
+  args: {
+    message: v.id("messages"),
+    value: v.string(),
   },
-  handler:async (ctx,args) => {
+  handler: async (ctx, args) => {
     const UserId = await getAuthUserId(ctx);
-    if(!UserId) {
-      throw new Error('Unauthorized')
+    if (!UserId) {
+      throw new Error("Unauthorized");
     }
 
-    const Message = await ctx.db.get(args.message)
+    const Message = await ctx.db.get(args.message);
 
-    if(!Message) {
-      throw new Error('Message Not Found')
-    }
-    
-    const CurrentMember = await ctx.db.query('members').withIndex('by_user',q => q.eq('user',UserId)).unique()
-
-    if(!CurrentMember) {
-      throw new Error('Member Not Found')
+    if (!Message) {
+      throw new Error("Message Not Found");
     }
 
-    if(Message.member !== CurrentMember._id){
-      throw new Error('Unauthorized')
+    const CurrentMember = await ctx.db
+      .query("members")
+      .withIndex("by_user", (q) => q.eq("user", UserId))
+      .unique();
+
+    if (!CurrentMember) {
+      throw new Error("Member Not Found");
     }
 
-    await ctx.db.patch(args.message,{
-      message:args.value,
-      updated:Date.now()
+    if (Message.member !== CurrentMember._id) {
+      throw new Error("Unauthorized");
+    }
+
+    await ctx.db.patch(args.message, {
+      message: args.value,
+      updated: Date.now(),
     });
 
     return args.message;
-  }
-})
-
-
-
-export const remove =  mutation({
-  args:{
-    message:v.id('messages')
   },
-  handler:async (ctx,args) => {
+});
+
+export const remove = mutation({
+  args: {
+    message: v.id("messages"),
+  },
+  handler: async (ctx, args) => {
     const UserId = await getAuthUserId(ctx);
-    if(!UserId) {
-      throw new Error('Unauthorized')
+    if (!UserId) {
+      throw new Error("Unauthorized");
     }
 
-    const Message = await ctx.db.get(args.message)
+    const Message = await ctx.db.get(args.message);
 
-    if(!Message) {
-      throw new Error('Message Not Found')
-    }
-    
-    const CurrentMember = await ctx.db.query('members').withIndex('by_user',q => q.eq('user',UserId)).unique()
-
-    if(!CurrentMember) {
-      throw new Error('Member Not Found')
+    if (!Message) {
+      throw new Error("Message Not Found");
     }
 
-    if(Message.member !== CurrentMember._id){
-      throw new Error('Unauthorized')
+    const CurrentMember = await ctx.db
+      .query("members")
+      .withIndex("by_user", (q) => q.eq("user", UserId))
+      .unique();
+
+    if (!CurrentMember) {
+      throw new Error("Member Not Found");
+    }
+
+    if (Message.member !== CurrentMember._id) {
+      throw new Error("Unauthorized");
     }
 
     // Removing Associated Image
-    if(Message.image){
-      await ctx.storage.delete(Message.image)
+    if (Message.image) {
+      await ctx.storage.delete(Message.image);
     }
-
 
     // Deleting The Message
     await ctx.db.delete(Message._id);
 
     return args.message;
-  }
-})
+  },
+});

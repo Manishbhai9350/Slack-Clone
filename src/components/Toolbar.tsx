@@ -14,11 +14,12 @@ interface ToolbarProps {
   message:Id<'messages'>;
   isEdit:null | Id<'messages'>;
   onEdit: () => void;
+  onReact: (Emoji:string) => void;
   isAuthor: boolean;
   isCompact?: boolean;
 }
 
-const Toolbar = ({ isAuthor, onEdit, isEdit, isCompact = false,message }: ToolbarProps) => {
+const Toolbar = ({ isAuthor, onEdit, isEdit, isCompact = false,message,onReact }: ToolbarProps) => {
 
   const {mutate:DeleteMessage,IsPending:IsDeletingMessage} = useDeleteMessage()
   const [Ok,Confirm] = UseConfirm()
@@ -49,7 +50,7 @@ const Toolbar = ({ isAuthor, onEdit, isEdit, isCompact = false,message }: Toolba
     )}>
       <Confirm message="Are you sure to delete this message?" title="Delete this message!"  />
       <div className="flex gap-2">
-        <EmojiPopover label="Reactions" onEmojiSelect={() => {}}>
+        <EmojiPopover label="Reactions" onEmojiSelect={(e:{native:string}) => onReact(e.native)}>
           <Button disabled={IsDeletingMessage} variant="outline">
             <Smile className="size-4" />
           </Button>

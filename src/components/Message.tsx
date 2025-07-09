@@ -6,6 +6,10 @@ import Thumbnail from "./Thumbnail";
 import Toolbar from "./Toolbar";
 import { Id } from "../../convex/_generated/dataModel";
 import { Dispatch, SetStateAction } from "react";
+import { useMessageReaction } from "@/features/reactions/api/useMessageReact";
+import { toast } from "sonner";
+import { useGetReactions } from "@/features/reactions/api/useGetMembers";
+import ShowReactions from "./Reactions";
 
 const Renderer = dynamic(() => import("./Renderer"));
 
@@ -24,6 +28,7 @@ interface MessageProps {
   authorImage: string | null;
   creationTime: number;
   updated: number | null;
+  reactions: (Doc<"reactions"> & { count: number; value: string }[]) | [];
 }
 
 const FormatFullTime = (date: Date) =>
@@ -44,20 +49,41 @@ const Message = ({
   IsCreating,
   updated,
   setIsCreating,
+  reactions,
 }: MessageProps) => {
+  const { mutate: AddReaction, IsPending: IsReacting } = useMessageReaction();
 
-  
   function HandleOnEdit() {
     if (IsCreating) return;
     setEditValue(content);
     setEdit(id);
   }
 
+  function HandleOnReact(Emoji: string) {
+    if (IsReacting) return;
+
+    AddReaction(
+      {
+        messageId: id,
+        value: Emoji,
+      },
+      {
+        onSuccess() {
+          toast.success("Reacted Successfully");
+        },
+        onError() {
+          toast.error("Failed To React");
+        },
+        throwError: true,
+      }
+    );
+  }
+
   if (!isCompact) {
     return (
-      <div className="p-2 flex items-start gap-2 hover:bg-slate-100 transition relative group">
-        <div className="logo-or w-12 aspect-square flex justify-center items-center">
-          <Avatar className="rounded-sm w-full h-full ">
+      <div className="p-2 flex items-start gap-2 hover:bg-slate-100 transition relative group overflow-x-hidden">
+        <div className="logo-or shrink-0 w-12 aspect-square flex justify-center items-center">
+          <Avatar className="rounded-sm w-full h-full">
             <AvatarFallback className="bg-amber-500 text-white text-2xl">
               <p>{authorName.charAt(0).toUpperCase()}</p>
             </AvatarFallback>
@@ -81,6 +107,10 @@ const Message = ({
             <Renderer content={content} />
             {image && <Thumbnail url={image} />}
             {updated && <p className="text-sm text-muted-foreground">Edited</p>}
+            <ShowReactions
+              reactions={reactions}
+              onChange={HandleOnReact}
+            />
           </div>
         </div>
         <Toolbar
@@ -88,12 +118,13 @@ const Message = ({
           isEdit={isEdit}
           onEdit={HandleOnEdit}
           isAuthor={isAuthor}
+          onReact={HandleOnReact}
         />
       </div>
     );
   } else {
     return (
-      <div className="p-2 flex items-start gap-2 hover:bg-slate-100 transition relative group">
+      <div className="p-2 flex items-start gap-2 hover:bg-slate-100 transition relative group overflow-x-hidden">
         <div className="flex gap-2 h-full justify-center items-center pt-2">
           <Hint label={FormatFullTime(new Date(creationTime))}>
             <p className="text-muted-foreground cursor-pointer text-xs text-center w-12 opacity-0 group-hover:opacity-100">
@@ -105,6 +136,10 @@ const Message = ({
           <Renderer content={content} />
           {image && <Thumbnail url={image} />}
           {updated && <p className="text-sm text-muted-foreground">Edited</p>}
+          <ShowReactions
+              reactions={reactions}
+              onChange={HandleOnReact}
+            />
         </div>
         <Toolbar
           message={id}
@@ -112,6 +147,7 @@ const Message = ({
           isEdit={isEdit}
           onEdit={HandleOnEdit}
           isAuthor={isAuthor}
+          onReact={HandleOnReact}
         />
       </div>
     );

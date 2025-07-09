@@ -17,6 +17,7 @@ import UseCurrentMember from "@/features/workspace/api/useCurrentMember";
 import { useUpdateMessage } from "@/features/messages/api/useUpdateMessage";
 import { Id } from "../../../../../../convex/_generated/dataModel";
 import { toast } from "sonner";
+import { useGetReactions } from "@/features/reactions/api/useGetMembers";
 
 const TIME_THRESHOLD = 30;
 
@@ -38,6 +39,7 @@ const ChannelPage = () => {
   const {Data:CurrentMember, IsLoading:CurrentMemberLoading} = UseCurrentMember({workspaceId:workspaceId})
 
   const {mutate:UpdateMessage,IsPending:UpdatingMessage} = useUpdateMessage()
+
 
   const { messages } = useGetMessages({ channel: channelId });
 
@@ -112,6 +114,7 @@ const ChannelPage = () => {
                             new Date(PrevMessage._creationTime),
                           ) < TIME_THRESHOLD
                         )
+                        console.log(msg)
                       return (
                         <Message
                           id={msg!._id}
@@ -129,6 +132,7 @@ const ChannelPage = () => {
                           key={msg._creationTime}
                           content={msg.message}
                           updated={msg.updated}
+                          reactions={msg.reactions || []}
                         />
                       );
                     })}

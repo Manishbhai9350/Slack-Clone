@@ -39,7 +39,8 @@ const schema = defineSchema({
     channel:v.optional(v.string()),
     image:v.optional(v.id('_storage')),
     parent:v.optional(v.id('messages')),
-    conversation:v.optional(v.id('conversations'))
+    conversation:v.optional(v.id('conversations')),
+    reactionUpdatedAt: v.optional(v.number())
   })
   .index('by_workspace',['workspace'])
   .index('by_member',['member'])
@@ -70,6 +71,9 @@ const schema = defineSchema({
   .index('by_workspace',['workspace'])
   .index('by_message',['message'])
   .index('by_member',['member'])
+  .index('by_message_member',['message','member'])
+  .index('by_message_reaction',['message','value'])
+  .index('by_message_member_value',['message','member','value'])
 
 
 });
