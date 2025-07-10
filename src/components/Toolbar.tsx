@@ -45,7 +45,7 @@ const Toolbar = ({ isAuthor, onEdit, isEdit, isCompact = false,message,onReact }
 
   return (
     <div className={cn(
-      'absolute top-4 right-5 opacity-0 group-hover:opacity-100',
+      'absolute top-1 right-5 opacity-0 group-hover:opacity-100',
       isCompact && 'top-[2px]'
     )}>
       <Confirm message="Are you sure to delete this message?" title="Delete this message!"  />

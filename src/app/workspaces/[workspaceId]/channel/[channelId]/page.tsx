@@ -12,7 +12,7 @@ import ChatInput from "@/app/workspaces/_components/ChatInput";
 import { useGetMessages } from "@/features/messages/api/useGetMessages";
 import { groupMessagesByDate } from "@/lib/message.lib";
 import Message from "@/components/Message";
-import {differenceInSeconds} from 'date-fns';
+import { differenceInSeconds } from "date-fns";
 import UseCurrentMember from "@/features/workspace/api/useCurrentMember";
 import { useUpdateMessage } from "@/features/messages/api/useUpdateMessage";
 import { Id } from "../../../../../../convex/_generated/dataModel";
@@ -25,10 +25,10 @@ const ChannelPage = () => {
   const workspaceId = useGetWorkspaceId();
   const channelId = useGetChannelId();
 
-  const [IsEdit, setIsEdit] = useState<Id<'messages'> | null>(null)
-  const [EditValue, setEditValue] = useState<string>('')
+  const [IsEdit, setIsEdit] = useState<Id<"messages"> | null>(null);
+  const [EditValue, setEditValue] = useState<string>("");
 
-  const [IsCreating, setIsCreating] = useState(false)
+  const [IsCreating, setIsCreating] = useState(false);
 
   const { Data: Channels, IsLoading: ChannelsLoading } = useGetChannels({
     workspaceId,
@@ -36,12 +36,21 @@ const ChannelPage = () => {
   const { Data: ChannelData, IsLoading: ChannelDataLoading } = useGetChannel({
     id: channelId,
   });
-  const {Data:CurrentMember, IsLoading:CurrentMemberLoading} = UseCurrentMember({workspaceId:workspaceId})
+  const { Data: CurrentMember, IsLoading: CurrentMemberLoading } =
+    UseCurrentMember({ workspaceId: workspaceId });
 
-  const {mutate:UpdateMessage,IsPending:UpdatingMessage} = useUpdateMessage()
+  const { mutate: UpdateMessage, IsPending: UpdatingMessage } =
+    useUpdateMessage();
 
+  const {
+    messages,
+    loadMore,
+    status,
+    isLoading: IsMessagesLoading,
+  } = useGetMessages({ channel: channelId });
 
-  const { messages } = useGetMessages({ channel: channelId });
+  const CanLoadMore = useMemo(() => status == "CanLoadMore", [status]);
+  const IsLoadingMore = useMemo(() => status == "LoadingMore", [status]);
 
   const GroupedMessages = groupMessagesByDate(messages);
 
@@ -49,27 +58,29 @@ const ChannelPage = () => {
 
   const Channel = useMemo(() => Channels?.[0]?._id, [Channels]);
 
-
-  function HandleUpdate(value:string){
-    if(!value || value.length == 0 || !IsEdit) return;
-    UpdateMessage({
-      value,
-      message:IsEdit
-    },{
-      onSuccess(){
-        toast.success('Message Updated Successfully')
-        HandleUpdateCancel()
+  function HandleUpdate(value: string) {
+    if (!value || value.length == 0 || !IsEdit) return;
+    UpdateMessage(
+      {
+        value,
+        message: IsEdit,
       },
-      onError(){
-        toast.error('Failed To Update Message')
-      },
-      throwError:true
-    })
+      {
+        onSuccess() {
+          toast.success("Message Updated Successfully");
+          HandleUpdateCancel();
+        },
+        onError() {
+          toast.error("Failed To Update Message");
+        },
+        throwError: true,
+      }
+    );
   }
 
-  function HandleUpdateCancel(){
-    setIsEdit(null)
-    setEditValue('')
+  function HandleUpdateCancel() {
+    setIsEdit(null);
+    setEditValue("");
   }
 
   useEffect(() => {
@@ -108,12 +119,12 @@ const ChannelPage = () => {
                     {group.reverse().map((msg, i) => {
                       const PrevMessage = group[i - 1];
                       const isCompact =
-                        PrevMessage && PrevMessage?.member?.id == msg?.member?.id && (
-                          differenceInSeconds(
-                            new Date(msg._creationTime),
-                            new Date(PrevMessage._creationTime),
-                          ) < TIME_THRESHOLD
-                        )
+                        PrevMessage &&
+                        PrevMessage?.member?.id == msg?.member?.id &&
+                        differenceInSeconds(
+                          new Date(msg._creationTime),
+                          new Date(PrevMessage._creationTime)
+                        ) < TIME_THRESHOLD;
                       return (
                         <Message
                           id={msg!._id}
@@ -139,9 +150,51 @@ const ChannelPage = () => {
                 </div>
               );
             })}
+
+          {IsLoadingMore && (
+            <div className="w-full border-b border-gray-400 relative my-6">
+              <div className="absolute p-2 rounded-4xl px-4 top-1/2 left-1/2 -translate-1/2 text-xs bg-white border border-gray-400 text-black/60 uppercase mb-2">
+                <Loader className="size-4 animate-spin" />
+              </div>
+            </div>
+          )}
+          <div
+            ref={(el) => {
+              if (el) {
+                const observer = new IntersectionObserver(
+                  (entries) => {
+                    if (
+                      entries &&
+                      entries.length > 0 &&
+                      entries[0].isIntersecting &&
+                      CanLoadMore
+                    ) {
+                      loadMore()
+                    }
+                  },
+                  {
+                    threshold: 1.0,
+                  }
+                );
+
+                observer.observe(el);
+
+                return () => observer.disconnect();
+              }
+            }}
+            className="load-more-observer"
+          />
         </div>
       </div>
-      <ChatInput IsCreating={IsCreating} setIsCreating={setIsCreating} updatePending={UpdatingMessage} onUpdateCancel={HandleUpdateCancel} onUpdate={HandleUpdate} isEdit={IsEdit} editValue={EditValue} />
+      <ChatInput
+        IsCreating={IsCreating}
+        setIsCreating={setIsCreating}
+        updatePending={UpdatingMessage}
+        onUpdateCancel={HandleUpdateCancel}
+        onUpdate={HandleUpdate}
+        isEdit={IsEdit}
+        editValue={EditValue}
+      />
     </div>
   );
 };

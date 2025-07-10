@@ -8,7 +8,7 @@ interface GetWorkspaceProps {
   conversation?: Id<"conversations">;
 }
 
-const INITIAL_SIZE = 10;
+const INITIAL_SIZE = 20;
 
 export const useGetMessages = ({
   channel,

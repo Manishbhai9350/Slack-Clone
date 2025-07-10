@@ -311,6 +311,8 @@ export const update = mutation({
       throw new Error("Unauthorized");
     }
 
+    console.log(args.value)
+
     await ctx.db.patch(args.message, {
       message: args.value,
       updated: Date.now(),
