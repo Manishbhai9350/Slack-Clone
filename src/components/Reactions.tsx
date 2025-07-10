@@ -29,10 +29,10 @@ const Reactions = ({ reactions, onChange }: ReactionsProps) => {
         reactions.map((Reaction) => (
           <Hint
             label={`${Reaction.count} ${Reaction.count > 1 ? 'peoples' : 'people' } reacted with ${Reaction.value}`}
+            key={Reaction._id}
           >
             <Button
               onClick={() => onChange(Reaction.value)}
-              key={Reaction._id}
               className={cn(
                 "flex  hover:bg-slate-100 hover:border-blue-500  bg-slate-100 transition-all duration-200 px-2 py-[4px] cursor-pointer rounded-full border justify-evenly items-start h-fit w-fit gap-2",
                 Reaction.memberIds.includes(CurrentMember?._id) &&
