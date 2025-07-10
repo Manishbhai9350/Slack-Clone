@@ -20,6 +20,7 @@ interface MessageProps {
   setEdit: Dispatch<SetStateAction<Id<"messages"> | null>>;
   setIsCreating: Dispatch<SetStateAction<boolean>>;
   IsCreating: boolean;
+  isThread?: boolean;
   content: string; // Pass Quill Delta
   isAuthor: boolean;
   isCompact: boolean;
@@ -50,6 +51,7 @@ const Message = ({
   updated,
   setIsCreating,
   reactions,
+  isThread = false
 }: MessageProps) => {
   const { mutate: AddReaction, IsPending: IsReacting } = useMessageReaction();
 
@@ -114,6 +116,7 @@ const Message = ({
           </div>
         </div>
         <Toolbar
+          isThread={isThread}
           message={id}
           isEdit={isEdit}
           onEdit={HandleOnEdit}
@@ -142,6 +145,7 @@ const Message = ({
             />
         </div>
         <Toolbar
+          isThread={isThread}
           message={id}
           isCompact
           isEdit={isEdit}

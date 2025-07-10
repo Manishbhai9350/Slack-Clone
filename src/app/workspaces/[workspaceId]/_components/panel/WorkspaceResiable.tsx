@@ -7,6 +7,7 @@ import {
   Plus,
   SendHorizonal,
   TriangleAlert,
+  XIcon,
 } from "lucide-react";
 
 import {
@@ -17,19 +18,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 
-
 import { Doc } from "../../../../../../convex/_generated/dataModel";
-import { ReactNode, useEffect, useMemo, useState } from "react";
+import { ReactNode, useState } from "react";
 import { useGetWorkSpace } from "@/features/workspace/api/useGetWorkspace";
 import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId";
-
 
 import { Button } from "@/components/ui/button";
 import PrefrencesDialog from "../PrefrencesDialog";
@@ -42,19 +40,31 @@ import PanelMemberItem from "./PanelMemberItem";
 import { useChannelAtom } from "@/features/channels/hooks/useChannel";
 import InviteModal from "./InviteModal";
 import ChannelItem from "./ChannelItem";
+import { useParentId } from "@/features/thread/store/useParentId";
+import { useGetThread } from "@/features/thread/api/useGetThread";
+import Message from "@/components/Message";
+import Thread from "@/components/Thread";
 
 export default function WorkspacePanel({ children }: { children: ReactNode }) {
+
+
+  const [parentId, setParentId] = useParentId();
+
+  function OnThreadCancel(){
+    setParentId(null)
+  }
+
   return (
     <ResizablePanelGroup
       autoSaveId={"workspace-resiable-panel"}
-      defaultValue={0}
       direction="horizontal"
       className="w-full h-full"
     >
       <ResizablePanel
         className="md:min-w-[270px]"
-        defaultSize={50}
+        defaultSize={20}
         minSize={20}
+        maxSize={35}
         order={1}
       >
         <PanelSideBar />
@@ -70,6 +80,20 @@ export default function WorkspacePanel({ children }: { children: ReactNode }) {
       >
         {children}
       </ResizablePanel>
+      {parentId && (
+        <>
+          <ResizableHandle withHandle />
+          <ResizablePanel
+            order={3}
+            defaultSize={30}
+            minSize={20}
+            maxSize={30}
+            color="#313131"
+          >
+            <Thread onCancel={OnThreadCancel} message={parentId as Id<'messages'>} />
+          </ResizablePanel>
+        </>
+      )}
     </ResizablePanelGroup>
   );
 }
@@ -91,7 +115,6 @@ function PanelSideBar() {
   const { Data: Members, IsLoading: MembersLoading } = useGetMembers({
     workspaceId,
   });
-
 
   if (WorkspaceLoading || MemberLoading) {
     return <Loader className="animate-spin transition" />;
@@ -122,7 +145,12 @@ function PanelSideBar() {
         {Channels &&
           Channels.length > 0 &&
           Channels.map((Item) => (
-            <ChannelItem key={Item._id} id={Item._id} icon={Hash} label={Item.name} />
+            <ChannelItem
+              key={Item._id}
+              id={Item._id}
+              icon={Hash}
+              label={Item.name}
+            />
           ))}
       </PanelItemSection>
       <PanelItemSection
@@ -175,7 +203,12 @@ function PanelSideBarHeader({
         setOpen={setPrefrencesOpen}
         open={PrefrencesOpen}
       />
-      <InviteModal name={workspace.name} joinCode={workspace.joinCode} open={InviteModalOpen} setOpen={setInviteModalOpen} />
+      <InviteModal
+        name={workspace.name}
+        joinCode={workspace.joinCode}
+        open={InviteModalOpen}
+        setOpen={setInviteModalOpen}
+      />
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -199,9 +232,12 @@ function PanelSideBarHeader({
           {member.role == "admin" && (
             <>
               <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={e => setInviteModalOpen(true)} className="cursor-pointer overflow-hidden ">
-                  <p className="truncate">Invite People To {workspace.name}</p>
-                </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={(e) => setInviteModalOpen(true)}
+                className="cursor-pointer overflow-hidden "
+              >
+                <p className="truncate">Invite People To {workspace.name}</p>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 onClick={() => setPrefrencesOpen(!PrefrencesOpen)}

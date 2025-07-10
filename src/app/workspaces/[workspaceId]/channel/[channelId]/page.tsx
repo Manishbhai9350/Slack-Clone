@@ -138,7 +138,7 @@ const ChannelPage = () => {
                           creationTime={msg._creationTime}
                           isCompact={isCompact}
                           authorName={msg?.user?.name}
-                          authorImage={msg?.user?.image}
+                          authorImage={msg?.user?.image || ''}
                           key={msg._creationTime}
                           content={msg.message}
                           updated={msg.updated}

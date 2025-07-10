@@ -25,23 +25,17 @@ const WorkSpacePage = () => {
     workspaceId,
   });
 
-
-  const Router = useRouter()
+  const Router = useRouter();
 
   const Channel = useMemo(() => Channels?.[0]?._id, [Channels]);
   const IsAdmin = useMemo(() => Member?.role == "admin", [Member]);
 
   useEffect(() => {
-    
-    if (
-      MemberLoading ||
-      ChannelsLoading ||
-      WorkspaceLoading
-    ) return;
+    if (MemberLoading || ChannelsLoading || WorkspaceLoading) return;
 
-    if(Channel) {
-      Router.push(`/workspaces/${workspaceId}/channel/${Channel}`)
-    } 
+    if (Channel) {
+      Router.push(`/workspaces/${workspaceId}/channel/${Channel}`);
+    }
 
     if (IsAdmin && !Channel && !createChannelOpen) {
       setCreateChannelOpen(true);
@@ -61,7 +55,7 @@ const WorkSpacePage = () => {
     createChannelOpen,
     setCreateChannelOpen,
     Router,
-  workspaceId
+    workspaceId,
   ]);
 
   if (MemberLoading || ChannelsLoading || WorkspaceLoading) {
@@ -89,7 +83,11 @@ const WorkSpacePage = () => {
     );
   }
 
-  return <>{JSON.stringify(Data)}</>;
+  return (
+    <div className="w-full h-full flex flex-col justify-center items-center gap-y-2">
+      <Loader className="animate-spin" />
+    </div>
+  );
 };
 
 export default WorkSpacePage;

@@ -46,7 +46,7 @@ function Header({name}:HeaderProps) {
   };
 
   return (
-    <div className="w-full h-12  border-b px-5 py-2 flex items-center gap-2">
+    <div className="w-full h-12  px-5 py-2 border-b flex items-center gap-2">
       <ConfirmDialog title="Delete Channel?" message="Are You Confirm" />
       <Dialog open={ChannelDialog} onOpenChange={setChannelDialog}>
         <DialogTrigger asChild>

@@ -12,7 +12,6 @@ interface Threads {
   timestamp: number;
 }
 
-
 const populateThread = async (
   id: Id<"messages">,
   ctx: QueryCtx
@@ -55,11 +54,19 @@ const populateThread = async (
   return ThreadData;
 };
 
-
-const populateReactions = async ({message,ctx}:{message:Id<"messages">,ctx:QueryCtx}) => {
-  const reactions = await ctx.db.query('reactions').withIndex('by_message',q => q.eq('message',message)).collect();
-  return reactions
-}
+const populateReactions = async ({
+  message,
+  ctx,
+}: {
+  message: Id<"messages">;
+  ctx: QueryCtx;
+}) => {
+  const reactions = await ctx.db
+    .query("reactions")
+    .withIndex("by_message", (q) => q.eq("message", message))
+    .collect();
+  return reactions;
+};
 
 const populateUser = (
   id: Id<"users">,
@@ -95,6 +102,79 @@ const getMember = (
     .unique();
 };
 
+export const getById = query({
+  args: {
+    id: v.id("messages"),
+  },
+  handler: async (ctx, args) => {
+    const UserId = await getAuthUserId(ctx);
+    if (!UserId) {
+      return null;
+    }
+
+    const message = await populateMessage(args.id, ctx);
+
+    if (!message) {
+      return null;
+    }
+
+    const member = await populateMember(message.member, ctx);
+    const user = member ? await populateUser(member.user, ctx) : null;
+
+    if (!member) {
+      return null;
+    }
+
+    const reactions = await populateReactions({ ctx, message: message._id });
+    const thread = await populateThread(message._id, ctx);
+
+    let image;
+
+    if (message.image) {
+      image = await ctx.storage.getUrl(message.image);
+    }
+
+    const EachReactionsWithCount = reactions.map((reaction) => {
+      return {
+        ...reaction,
+        count: reactions.filter((r) => r.value === reaction.value).length,
+      };
+    });
+
+    const FilteredReactions = EachReactionsWithCount.reduce(
+      (acc, reaction) => {
+        const ExistingReaction = acc.find((r) => r.value == reaction.value);
+
+        if (ExistingReaction) {
+          ExistingReaction.memberIds = Array.from(
+            new Set([...ExistingReaction.memberIds, reaction.member])
+          );
+        } else {
+          acc.push({ ...reaction, memberIds: [reaction.member] });
+        }
+
+        return acc;
+      },
+      [] as (Doc<"reactions"> & {
+        count: number;
+        memberIds: Id<"members">[];
+      })[]
+    );
+
+    const ReactionsWithoutMembers = FilteredReactions.map(
+      ({ member, ...rest }) => rest
+    );
+
+    return {
+      ...message,
+      reactions: ReactionsWithoutMembers,
+      thread,
+      image,
+      user,
+      member
+    };
+  },
+});
 
 export const get = query({
   args: {
@@ -133,73 +213,78 @@ export const get = query({
       .order("desc")
       .paginate(args.paginationOpts); // 👈 Keep as-is
 
-      return {
-        ...results,
-        page:(
-          await Promise.all(
-            results.page.map(async (message) => {
-              const member = await populateMember(message.member,ctx)
-              const user = member ? await populateUser(member.user,ctx) : null;
+    return {
+      ...results,
+      page: (
+        await Promise.all(
+          results.page.map(async (message) => {
+            const member = await populateMember(message.member, ctx);
+            const user = member ? await populateUser(member.user, ctx) : null;
 
-              if(!member || !user) {
-                return null;
-              }
+            if (!member || !user) {
+              return null;
+            }
 
-              const reactions = await populateReactions({ctx,message:message._id});
-              const thread = await populateThread(message._id,ctx)
+            const reactions = await populateReactions({
+              ctx,
+              message: message._id,
+            });
+            const thread = await populateThread(message._id, ctx);
 
-              let image;
+            let image;
 
-              if(message.image) {
-                image = await ctx.storage.getUrl(message.image)
-              }
+            if (message.image) {
+              image = await ctx.storage.getUrl(message.image);
+            }
 
-              const EachReactionsWithCount = reactions.map(reaction => {
-                return {
-                  ...reaction,
-                  count:reactions.filter(r => r.value === reaction.value).length
+            const EachReactionsWithCount = reactions.map((reaction) => {
+              return {
+                ...reaction,
+                count: reactions.filter((r) => r.value === reaction.value)
+                  .length,
+              };
+            });
+
+            const FilteredReactions = EachReactionsWithCount.reduce(
+              (acc, reaction) => {
+                const ExistingReaction = acc.find(
+                  (r) => r.value == reaction.value
+                );
+
+                if (ExistingReaction) {
+                  ExistingReaction.memberIds = Array.from(
+                    new Set([...ExistingReaction.memberIds, reaction.member])
+                  );
+                } else {
+                  acc.push({ ...reaction, memberIds: [reaction.member] });
                 }
-              })
 
-              const FilteredReactions = EachReactionsWithCount.reduce(
-                (acc,reaction) => {
-
-                  const ExistingReaction = acc.find(r => r.value == reaction.value)
-
-                  if(ExistingReaction) {
-                    ExistingReaction.memberIds = Array.from(
-                      new Set([...ExistingReaction.memberIds,reaction.member])
-                    )
-                  } else {
-                    acc.push({...reaction,memberIds:[reaction.member]})
-                  }
-
-                  return acc;
-
-              },[] as (Doc<'reactions'> & {
-                count:number;
-                memberIds:Id<'members'>[];
+                return acc;
+              },
+              [] as (Doc<"reactions"> & {
+                count: number;
+                memberIds: Id<"members">[];
               })[]
             );
 
-            const ReactionsWithoutMembers = FilteredReactions.map(({member,...rest}) => rest);
+            const ReactionsWithoutMembers = FilteredReactions.map(
+              ({ member, ...rest }) => rest
+            );
 
             return {
               ...message,
               image,
               member,
               user,
-              reactions:ReactionsWithoutMembers,
-              threadCount:thread.count,
-              threadImage:thread.image,
-              threadTimestamp:thread.timestamp
-            }
-
-            })
-          )
-        ).filter((message) => message !== null)
-      }
-
+              reactions: ReactionsWithoutMembers,
+              threadCount: thread.count,
+              threadImage: thread.image,
+              threadTimestamp: thread.timestamp,
+            };
+          })
+        )
+      ).filter((message) => message !== null),
+    };
   },
 });
 
@@ -311,7 +396,7 @@ export const update = mutation({
       throw new Error("Unauthorized");
     }
 
-    console.log(args.value)
+    console.log(args.value);
 
     await ctx.db.patch(args.message, {
       message: args.value,
