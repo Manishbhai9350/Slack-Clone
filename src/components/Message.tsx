@@ -127,7 +127,7 @@ const Message = ({
       <div className="p-2 flex items-start gap-2 hover:bg-slate-100 transition relative group overflow-x-hidden">
         <div className="flex gap-2 h-full justify-center items-center pt-2">
           <Hint label={FormatFullTime(new Date(creationTime))}>
-            <p className="text-muted-foreground cursor-pointer text-xs text-center w-12 opacity-0 group-hover:opacity-100">
+            <p className="text-muted-foreground cursor-pointer text-[10px] text-center w-12 opacity-0 group-hover:opacity-100">
               {format(new Date(creationTime), "h:mm a")}
             </p>
           </Hint>

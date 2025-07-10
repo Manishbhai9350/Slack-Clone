@@ -114,7 +114,6 @@ const ChannelPage = () => {
                             new Date(PrevMessage._creationTime),
                           ) < TIME_THRESHOLD
                         )
-                        console.log(msg)
                       return (
                         <Message
                           id={msg!._id}
@@ -124,7 +123,7 @@ const ChannelPage = () => {
                           isEdit={IsEdit}
                           setEdit={setIsEdit}
                           isAuthor={msg?.member?._id == CurrentMember?._id}
-                          image={msg.img}
+                          image={msg.image}
                           creationTime={msg._creationTime}
                           isCompact={isCompact}
                           authorName={msg?.user?.name}
