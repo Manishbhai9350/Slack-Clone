@@ -78,7 +78,6 @@ const ChatInput = ({isEdit,editValue,onUpdate,onUpdateCancel,updatePending,IsCre
 
     CreateMessage(Values, {
       onSuccess(messageId) {
-        console.log(messageId);
         toast.success("Message Send Successfully");
       },
       onError() {

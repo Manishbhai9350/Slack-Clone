@@ -5,9 +5,7 @@ import {
   Loader,
   MessageSquareText,
   Plus,
-  SendHorizonal,
-  TriangleAlert,
-  XIcon,
+  SendHorizonal
 } from "lucide-react";
 
 import {
@@ -24,7 +22,7 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 
-import { Doc } from "../../../../../../convex/_generated/dataModel";
+import { Doc, Id } from "../../../../../../convex/_generated/dataModel";
 import { ReactNode, useState } from "react";
 import { useGetWorkSpace } from "@/features/workspace/api/useGetWorkspace";
 import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId";
@@ -41,8 +39,6 @@ import { useChannelAtom } from "@/features/channels/hooks/useChannel";
 import InviteModal from "./InviteModal";
 import ChannelItem from "./ChannelItem";
 import { useParentId } from "@/features/thread/store/useParentId";
-import { useGetThread } from "@/features/thread/api/useGetThread";
-import Message from "@/components/Message";
 import Thread from "@/components/Thread";
 
 export default function WorkspacePanel({ children }: { children: ReactNode }) {
@@ -85,9 +81,9 @@ export default function WorkspacePanel({ children }: { children: ReactNode }) {
           <ResizableHandle withHandle />
           <ResizablePanel
             order={3}
-            defaultSize={30}
-            minSize={20}
-            maxSize={30}
+            defaultSize={40}
+            minSize={40}
+            maxSize={45}
             color="#313131"
           >
             <Thread onCancel={OnThreadCancel} message={parentId as Id<'messages'>} />

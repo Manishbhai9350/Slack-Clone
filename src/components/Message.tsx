@@ -107,7 +107,7 @@ const Message = ({
           </div>
           <div className="flex flex-col gap-2">
             <Renderer content={content} />
-            {image && <Thumbnail url={image} />}
+            {image && !isThread && <Thumbnail url={image} />}
             {updated && <p className="text-sm text-muted-foreground">Edited</p>}
             <ShowReactions
               reactions={reactions}
@@ -137,7 +137,7 @@ const Message = ({
         </div>
         <div className="flex flex-col gap-2">
           <Renderer content={content} />
-          {image && <Thumbnail url={image} />}
+          {image && !isThread && <Thumbnail url={image} />}
           {updated && <p className="text-sm text-muted-foreground">Edited</p>}
           <ShowReactions
               reactions={reactions}

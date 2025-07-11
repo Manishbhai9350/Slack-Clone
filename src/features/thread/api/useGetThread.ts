@@ -4,11 +4,12 @@ import { Id } from "../../../../convex/_generated/dataModel";
 
 interface GetThreadProps {
   id: Id<"messages">;
+  parent: Id<"messages">;
 }
 
-export const useGetThread = ({ id }: GetThreadProps) => {
+export const useGetThread = (values: GetThreadProps) => {
   try {
-    const Data = useQuery(api.messages.getById, { id });
+    const Data = useQuery(api.messages.getById, values);
 
     let IsLoading;
 

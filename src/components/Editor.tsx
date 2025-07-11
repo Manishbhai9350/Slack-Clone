@@ -22,6 +22,7 @@ interface EditorProps {
   innerRef: Ref;
   isEdit: null | Id<"messages">;
   updateValue: string;
+  noControl?: boolean;
 }
 
 const Editor = ({
@@ -31,7 +32,8 @@ const Editor = ({
   onSubmit,
   disabled,
   innerRef,
-  updateValue
+  updateValue,
+  noControl = false
 }: EditorProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const quillRef = useRef<Quill | null>(null);
@@ -152,7 +154,7 @@ const Editor = ({
     !IMG && Value.replace(/<(.|\n)*?>/g, "").trim().length == 0;
 
   return (
-    <div className="flex flex-col pr-4">
+    <div className="flex flex-col w-full">
       <input
         ref={imageELementRef}
         type="file"
@@ -243,6 +245,8 @@ const Editor = ({
           )}
         </div>
       </div>
+      {
+        !noControl && (
       <div
         className={cn(
           "flex justify-end text-[10px] text-muted-foreground p-2 transition",
@@ -251,6 +255,8 @@ const Editor = ({
       >
         <strong>Shift + Enter</strong>&nbsp;to add a new line
       </div>
+        )
+      }
     </div>
   );
 };

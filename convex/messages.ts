@@ -102,9 +102,41 @@ const getMember = (
     .unique();
 };
 
+const deduptReactions = (reactions: Doc<"reactions">[]) => {
+  const EachReactionsWithCount = reactions.map((reaction) => {
+    return {
+      ...reaction,
+      count: reactions.filter((r) => r.value === reaction.value).length,
+    };
+  });
+
+  const FilteredReactions = EachReactionsWithCount.reduce(
+    (acc, reaction) => {
+      const ExistingReaction = acc.find((r) => r.value == reaction.value);
+
+      if (ExistingReaction) {
+        ExistingReaction.memberIds = Array.from(
+          new Set([...ExistingReaction.memberIds, reaction.member])
+        );
+      } else {
+        acc.push({ ...reaction, memberIds: [reaction.member] });
+      }
+
+      return acc;
+    },
+    [] as (Doc<"reactions"> & {
+      count: number;
+      memberIds: Id<"members">[];
+    })[]
+  );
+
+  return FilteredReactions.map(({ member, ...rest }) => rest);
+};
+
 export const getById = query({
   args: {
     id: v.id("messages"),
+    parent: v.id("messages"),
   },
   handler: async (ctx, args) => {
     const UserId = await getAuthUserId(ctx);
@@ -134,44 +166,42 @@ export const getById = query({
       image = await ctx.storage.getUrl(message.image);
     }
 
-    const EachReactionsWithCount = reactions.map((reaction) => {
-      return {
-        ...reaction,
-        count: reactions.filter((r) => r.value === reaction.value).length,
-      };
-    });
+    const threads = await ctx.db
+      .query("messages")
+      .withIndex("by_parent", (q) => q.eq("parent", args.parent))
+      .collect();
 
-    const FilteredReactions = EachReactionsWithCount.reduce(
-      (acc, reaction) => {
-        const ExistingReaction = acc.find((r) => r.value == reaction.value);
-
-        if (ExistingReaction) {
-          ExistingReaction.memberIds = Array.from(
-            new Set([...ExistingReaction.memberIds, reaction.member])
-          );
-        } else {
-          acc.push({ ...reaction, memberIds: [reaction.member] });
-        }
-
-        return acc;
-      },
-      [] as (Doc<"reactions"> & {
-        count: number;
-        memberIds: Id<"members">[];
-      })[]
-    );
-
-    const ReactionsWithoutMembers = FilteredReactions.map(
-      ({ member, ...rest }) => rest
-    );
+    console.log(threads);
 
     return {
       ...message,
-      reactions: ReactionsWithoutMembers,
+      reactions: deduptReactions(reactions),
       thread,
+      threads: await Promise.all(
+        threads.map(async (Thread) => {
+          const reactions = await populateReactions({
+            ctx,
+            message: Thread._id,
+          });
+
+          const member = await populateMember(Thread.member, ctx);
+          const user = member ? await populateUser(member.user, ctx) : null;
+
+          if (!member || !user) {
+            return null;
+          }
+
+          return {
+            ...Thread,
+            user,
+            member,
+            reactions: deduptReactions(reactions),
+          };
+        })
+      ),
       image,
       user,
-      member
+      member,
     };
   },
 });
@@ -191,6 +221,7 @@ export const get = query({
 
     let _conversation = args.conversation;
 
+    // Only Possible in 1:1 Conversation
     if (args.parent && !args.channel && !args.conversation) {
       const conversation = await ctx.db
         .query("messages")
@@ -395,8 +426,6 @@ export const update = mutation({
     if (Message.member !== CurrentMember._id) {
       throw new Error("Unauthorized");
     }
-
-    console.log(args.value);
 
     await ctx.db.patch(args.message, {
       message: args.value,
