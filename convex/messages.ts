@@ -166,39 +166,11 @@ export const getById = query({
       image = await ctx.storage.getUrl(message.image);
     }
 
-    const threads = await ctx.db
-      .query("messages")
-      .withIndex("by_parent", (q) => q.eq("parent", args.parent))
-      .collect();
-
-    console.log(threads);
 
     return {
       ...message,
       reactions: deduptReactions(reactions),
       thread,
-      threads: await Promise.all(
-        threads.map(async (Thread) => {
-          const reactions = await populateReactions({
-            ctx,
-            message: Thread._id,
-          });
-
-          const member = await populateMember(Thread.member, ctx);
-          const user = member ? await populateUser(member.user, ctx) : null;
-
-          if (!member || !user) {
-            return null;
-          }
-
-          return {
-            ...Thread,
-            user,
-            member,
-            reactions: deduptReactions(reactions),
-          };
-        })
-      ),
       image,
       user,
       member,

@@ -1,5 +1,5 @@
 import Quill, { Delta, QuillOptions } from "quill";
-import { Dispatch, Ref, SetStateAction, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Ref, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { Smile, ImageIcon, XIcon } from "lucide-react";
 import { PiTextAa } from "react-icons/pi";
@@ -204,7 +204,7 @@ const Editor = ({
               <Smile className="size-4" />
             </Button>
           </EmojiPopover>
-          {variant == "create" && (
+          {variant == "create" && !noControl && (
             <Hint label="Image">
               <Button
                 onClick={() => imageELementRef?.current?.click()}
@@ -245,8 +245,6 @@ const Editor = ({
           )}
         </div>
       </div>
-      {
-        !noControl && (
       <div
         className={cn(
           "flex justify-end text-[10px] text-muted-foreground p-2 transition",
@@ -255,8 +253,6 @@ const Editor = ({
       >
         <strong>Shift + Enter</strong>&nbsp;to add a new line
       </div>
-        )
-      }
     </div>
   );
 };
