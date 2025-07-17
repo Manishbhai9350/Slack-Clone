@@ -4,12 +4,12 @@ import { format, isToday, isYesterday } from "date-fns";
 import Hint from "./Hint";
 import Thumbnail from "./Thumbnail";
 import Toolbar from "./Toolbar";
-import { Id } from "../../convex/_generated/dataModel";
+import { Doc, Id } from "../../convex/_generated/dataModel";
 import { Dispatch, SetStateAction } from "react";
 import { useMessageReaction } from "@/features/reactions/api/useMessageReact";
 import { toast } from "sonner";
-import { useGetReactions } from "@/features/reactions/api/useGetMembers";
 import ShowReactions from "./Reactions";
+import { ReactionsWithoutMembers } from "@/lib/message.lib";
 
 const Renderer = dynamic(() => import("./Renderer"));
 
@@ -24,12 +24,12 @@ interface MessageProps {
   content: string; // Pass Quill Delta
   isAuthor: boolean;
   isCompact: boolean;
-  image: string;
-  authorName: string;
+  image: string | undefined;
+  authorName: string | undefined;
   authorImage: string | null;
   creationTime: number;
   updated: number | null;
-  reactions: (Doc<"reactions"> & { count: number; value: string }[]) | [];
+  reactions: ReactionsWithoutMembers  | [];
 }
 
 const FormatFullTime = (date: Date) =>

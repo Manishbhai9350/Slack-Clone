@@ -40,6 +40,7 @@ import InviteModal from "./InviteModal";
 import ChannelItem from "./ChannelItem";
 import { useParentId } from "@/features/thread/store/useParentId";
 import Thread from "@/components/Thread";
+import { useGetOtherMemberId } from "@/features/conversation/hooks/useGetOtherMember";
 
 export default function WorkspacePanel({ children }: { children: ReactNode }) {
 
@@ -111,6 +112,7 @@ function PanelSideBar() {
   const { Data: Members, IsLoading: MembersLoading } = useGetMembers({
     workspaceId,
   });
+  const OtherMemberId = useGetOtherMemberId()
 
   if (WorkspaceLoading || MemberLoading) {
     return <Loader className="animate-spin transition" />;
@@ -171,8 +173,10 @@ function PanelSideBar() {
           Members.map((Item) => (
             <PanelMemberItem
               key={Item._id}
+              isActive={Item._id == OtherMemberId}
               name={Item.User?.name}
               image={Item.User?.image}
+              id={Item._id}
             />
           ))}
       </PanelItemSection>

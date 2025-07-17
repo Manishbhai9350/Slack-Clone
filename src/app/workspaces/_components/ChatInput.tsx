@@ -18,10 +18,12 @@ interface ChatInputProps {
   onUpdateCancel:() => void;
   setIsCreating: Dispatch<SetStateAction<boolean>>;
   IsCreating:boolean;
+  conversation?:Id<'conversations'>;
+  variant:'messages' | 'conversation';
 }
 
 
-const ChatInput = ({isEdit,editValue,onUpdate,onUpdateCancel,updatePending,IsCreating,setIsCreating}:ChatInputProps) => {
+const ChatInput = ({isEdit,editValue,onUpdate,onUpdateCancel,updatePending,IsCreating,setIsCreating,variant,conversation}:ChatInputProps) => {
   const workspaceId = useGetWorkspaceId();
   const channelId = useGetChannelId();
 
@@ -54,6 +56,7 @@ const ChatInput = ({isEdit,editValue,onUpdate,onUpdateCancel,updatePending,IsCre
       workspace: workspaceId,
       channel: channelId,
       image: undefined,
+      conversation
     };
 
     if (image) {

@@ -1,14 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { Id } from "../../../../convex/_generated/dataModel";
 
 interface GetWorkspaceProps {
-  workspaceId: Id<"workspaces">;
+  id: Id<"members">;
 }
 
-export const useGetWorkSpace = ({ workspaceId }: GetWorkspaceProps) => {
+export const useGetMember = ({ id }: GetWorkspaceProps) => {
   try {
-    const Data = useQuery(api.workspaces.getWorkspace, { workspaceId });
+    const Data = useQuery(api.member.getById, { id });
 
     let IsLoading;
 

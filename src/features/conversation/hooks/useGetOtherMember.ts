@@ -2,8 +2,8 @@ import { useParams } from "next/navigation"
 import { Id } from "../../../../convex/_generated/dataModel"
 
 
-export const useGetChannelId = () => {
+export const useGetOtherMemberId = () => {
     const Params = useParams()
 
-    return Params?.channelId as Id<'channels'>
+    return Params?.memberId as Id<'members'>
 }

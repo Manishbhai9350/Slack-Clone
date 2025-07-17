@@ -191,19 +191,6 @@ export const get = query({
       throw new Error("Unauthorized");
     }
 
-    let _conversation = args.conversation;
-
-    // Only Possible in 1:1 Conversation
-    if (args.parent && !args.channel && !args.conversation) {
-      const conversation = await ctx.db
-        .query("messages")
-        .withIndex("by_parent", (q) => q.eq("parent", args.parent))
-        .unique();
-
-      if (conversation) {
-        _conversation = conversation.conversation;
-      }
-    }
 
     const results = await ctx.db
       .query("messages")
@@ -211,7 +198,7 @@ export const get = query({
         q
           .eq("channel", args.channel)
           .eq("parent", args.parent)
-          .eq("conversation", _conversation)
+          .eq("conversation", args.conversation)
       )
       .order("desc")
       .paginate(args.paginationOpts); // 👈 Keep as-is
@@ -312,18 +299,6 @@ export const create = mutation({
       throw new Error("Unauthorized");
     }
 
-    let _conversation = args.conversation;
-
-    // Replying Case IN 1:1 Conversation
-    if (!_conversation && args.parent && !args.channel) {
-      const Message = await ctx.db.get(args.parent);
-
-      if (!Message) {
-        throw new Error("No Parent Found");
-      }
-
-      _conversation = Message.conversation;
-    }
 
     const CreatedMessageId = await ctx.db.insert("messages", {
       message: args.message,
@@ -332,7 +307,7 @@ export const create = mutation({
       channel: args.channel,
       image: args.image,
       parent: args.parent,
-      conversation: _conversation,
+      conversation: args.conversation,
     });
 
     return CreatedMessageId;

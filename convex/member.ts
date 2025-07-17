@@ -45,3 +45,36 @@ export const current = query({
     return Member
   },
 });
+
+
+export const getById = query({
+  args: { id: v.id("members") },
+  handler: async (ctx, args) => {
+    const UserId = await getAuthUserId(ctx);
+    if (!UserId) {
+      return null;
+    }
+
+    if(!args.id) return null;
+    const currentMember = await ctx.db.query('members').withIndex('by_user',q => q.eq('user',UserId)).unique()
+    if(!currentMember) return null;
+    
+    const Member = await ctx.db.get(args.id)
+    if(!Member) return null;
+
+    const MemberUser = await ctx.db.get(Member.user)
+
+    if(!MemberUser) {
+      return null;
+    }
+
+
+    return {
+      ...Member,
+      user:MemberUser
+    }
+  },
+});
+
+
+

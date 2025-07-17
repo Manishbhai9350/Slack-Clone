@@ -121,6 +121,8 @@ export const get = query({
     return Channels;
   },
 });
+
+
 export const getById = query({
   args: {
     id: v.id("channels"),
@@ -128,7 +130,7 @@ export const getById = query({
   handler: async (ctx, args) => {
     const UserId = await getAuthUserId(ctx);
     if (!UserId) {
-      return [];
+      return null;
     }
 
     const Channel = await ctx.db.get(args.id)

@@ -1,17 +1,34 @@
 
 import { format, isToday, isYesterday } from "date-fns";
+import { Doc, Id } from "../../convex/_generated/dataModel";
 
-type Message = {
-  _id: string;
+export type ReactionsWithoutMembers = {
+    _id: Id<"reactions">;
+    _creationTime: number;
+    workspace: Id<"workspaces">;
+    message: Id<"messages">;
+    value: string;
+    count: number;
+    memberIds: Id<"members">[];
+}[]
+
+
+export type MessageType = {
+  _id: Id<'messages'>;
   _creationTime: number; // Convex timestamp
-  // other fields...
+  member:Doc<'members'>;
+  user:Doc<'users'>;
+  reactions:ReactionsWithoutMembers;
+  updated:number | null;
+  message:string;
+  image:string | undefined;
 };
 
 type GroupedMessages = {
-  [label: string]: Message[];
+  [label: string]: MessageType[];
 };
 
-export function groupMessagesByDate(messages:[]): GroupedMessages {
+export function groupMessagesByDate(messages:MessageType[]): GroupedMessages | null {
 
   if(!messages || messages
     .length == 0) return null;
