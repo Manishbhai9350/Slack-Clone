@@ -136,7 +136,6 @@ const deduptReactions = (reactions: Doc<"reactions">[]) => {
 export const getById = query({
   args: {
     id: v.id("messages"),
-    parent: v.id("messages"),
   },
   handler: async (ctx, args) => {
     const UserId = await getAuthUserId(ctx);
@@ -180,7 +179,7 @@ export const getById = query({
 
 export const get = query({
   args: {
-    channel: v.optional(v.string()),
+    channel: v.optional(v.id('channels')),
     parent: v.optional(v.id("messages")),
     conversation: v.optional(v.id("conversations")),
     paginationOpts: paginationOptsValidator,
@@ -188,7 +187,19 @@ export const get = query({
   handler: async (ctx, args) => {
     const UserId = await getAuthUserId(ctx);
     if (!UserId) {
-      throw new Error("Unauthorized");
+      return null;
+    }
+    
+    let _conversation = args?.conversation;
+
+    if(!args?.conversation && args.parent && !args?.channel){
+      const parentMessage = await ctx.db.get(args.parent)
+      
+      if(!parentMessage){
+        return null;
+      }
+
+      _conversation = parentMessage.conversation
     }
 
 
@@ -198,10 +209,11 @@ export const get = query({
         q
           .eq("channel", args.channel)
           .eq("parent", args.parent)
-          .eq("conversation", args.conversation)
+          .eq("conversation", _conversation)
       )
       .order("desc")
       .paginate(args.paginationOpts); // 👈 Keep as-is
+
 
     return {
       ...results,
@@ -299,6 +311,18 @@ export const create = mutation({
       throw new Error("Unauthorized");
     }
 
+    let _conversation = args?.conversation;
+
+    if(!args?.conversation && args.parent && !args?.channel){
+      const parentMessage = await ctx.db.get(args.parent)
+      
+      if(!parentMessage){
+        return null;
+      }
+
+      _conversation = parentMessage.conversation
+    }
+
 
     const CreatedMessageId = await ctx.db.insert("messages", {
       message: args.message,
@@ -307,7 +331,7 @@ export const create = mutation({
       channel: args.channel,
       image: args.image,
       parent: args.parent,
-      conversation: args.conversation,
+      conversation: _conversation,
     });
 
     return CreatedMessageId;

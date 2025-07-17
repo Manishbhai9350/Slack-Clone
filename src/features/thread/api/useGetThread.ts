@@ -4,7 +4,6 @@ import { Id } from "../../../../convex/_generated/dataModel";
 
 interface GetThreadProps {
   id: Id<"messages">;
-  parent: Id<"messages">;
 }
 
 export const useGetThread = (values: GetThreadProps) => {

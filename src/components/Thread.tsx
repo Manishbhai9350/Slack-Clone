@@ -32,20 +32,23 @@ const Thread = ({ message, onCancel }: ThreadProps) => {
   const workspaceId = useGetWorkspaceId();
   const ChannelId = useGetChannelId();
 
+  console.log(message)
+
   const [parentId, setParentId] = useParentId();
 
   const { Data: CurrentMember } = UseCurrentMember({ workspaceId });
-  const { Data: CurrentMessage } = useGetThread({
+  const { Data: CurrentMessage, IsLoading:IsCurrentMessageLoading } = useGetThread({
     id: message,
-    parent: parentId,
   });
+
+  console.log(CurrentMessage,IsCurrentMessageLoading)
 
   const {
     messages: Threads,
-    loadMore,
-    status,
     isLoading: IsMessagesLoading,
   } = useGetMessages({ channel: ChannelId, parent: parentId });
+
+  console.log(Threads)
 
 
   const { mutate: CreateThread, IsPending: IsCreatingThread } =
@@ -113,7 +116,7 @@ const Thread = ({ message, onCancel }: ThreadProps) => {
     );
   }
 
-  if(IsMessagesLoading) {
+  if(IsMessagesLoading || IsCurrentMessageLoading) {
     return <div className="w-full h-full flex justify-center items-center" >
         <Loader className="size-6 animate-spin" />
       </div>
