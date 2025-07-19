@@ -1,6 +1,7 @@
 import { formatDistanceToNow } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { cn } from "@/lib/utils";
+import { ChevronRight } from "lucide-react";
 
 interface ThreadBarProps {
   count?: number;
@@ -28,12 +29,12 @@ const ThreadBar = ({
     const colorIndex = name.length % colors.length;
     if(!count || !name) return null;
   return (
-    <div onClick={onClick} className="bg-white cursor-pointer rounded-sm p-1 flex justify-start items-center gap-2 group/thread-bar">
+    <div onClick={onClick} className="bg-white w-[600px]  cursor-pointer rounded-sm p-1 flex justify-start items-center gap-2 group/thread-bar">
         <Avatar className={cn(colors[colorIndex || 0])}>
             <AvatarImage src={image} alt="Avatar Image" />
             <AvatarFallback className="bg-transparent">{avatarFallback}</AvatarFallback>
         </Avatar>
-        <p className="text-md text-blue-600">
+        <p className="text-md text-blue- hover:underline text-blue-500">
             {
                 count
             }
@@ -41,12 +42,15 @@ const ThreadBar = ({
                 count > 1 ? ' Replies' : ' Reply'
             }
         </p>
-        <p className="text-xs text-muted-foreground group-hover/thread-bar:block hidden">
+        <p className="text-xs text-muted-foreground group-hover/thread-bar:hidden block">
             Last reply about {formatDistanceToNow(new Date(timestamp),{addSuffix:true})}
         </p>
-        <p className="text-xs text-muted-foreground group-hover/thread-bar:hidden block">
+        <p className="text-xs text-muted-foreground group-hover/thread-bar:block hidden">
             View threads
         </p>
+        <div className="text-muted-foreground flex-1 flex justify-end px-1 items-center h-full group-hover/thread-bar:opacity-100 opacity-0 transition duration-200">
+            <ChevronRight />
+        </div>
     </div>
   );
 };
