@@ -125,11 +125,15 @@ export const get = query({
 
 export const getById = query({
   args: {
-    id: v.id("channels"),
+    id:v.id("channels"),
   },
   handler: async (ctx, args) => {
     const UserId = await getAuthUserId(ctx);
     if (!UserId) {
+      return null;
+    }
+
+    if(!args.id){
       return null;
     }
 

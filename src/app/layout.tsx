@@ -13,8 +13,8 @@ import { Toaster } from "@/components/ui/sonner";
 import JotaiProvider from "@/components/Providers/jotai.provider";
 
 export const metadata: Metadata = {
-  title: "Slack Clone",
-  description: "Fullstack Slack Clone",
+  title: "Zonux",
+  description: "Conux - Team Management & Chat App",
 };
 
 export default function RootLayout({

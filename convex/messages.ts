@@ -10,6 +10,7 @@ interface Threads {
   count: number;
   image: string | null;
   timestamp: number;
+  name?:string;
 }
 
 const populateThread = async (
@@ -26,6 +27,7 @@ const populateThread = async (
       count: 0,
       image: null,
       timestamp: 0,
+      name:''
     };
   }
 
@@ -33,6 +35,7 @@ const populateThread = async (
     count: 0,
     image: null,
     timestamp: 0,
+    name:''
   };
 
   const LastMessage = Messages[Messages.length - 1];
@@ -50,6 +53,7 @@ const populateThread = async (
   ThreadData.count = Messages.length;
   ThreadData.image = LastUser.image || null;
   ThreadData.timestamp = LastMessage._creationTime;
+  ThreadData.name = LastUser.name;
 
   return ThreadData;
 };
@@ -282,6 +286,7 @@ export const get = query({
               threadCount: thread.count,
               threadImage: thread.image,
               threadTimestamp: thread.timestamp,
+              threadName:thread.name
             };
           })
         )

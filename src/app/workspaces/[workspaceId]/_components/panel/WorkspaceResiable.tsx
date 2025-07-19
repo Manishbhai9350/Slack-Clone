@@ -55,10 +55,10 @@ export default function WorkspacePanel({ children }: { children: ReactNode }) {
     <ResizablePanelGroup
       autoSaveId={"workspace-resiable-panel"}
       direction="horizontal"
-      className="w-full h-full"
+      className="w-full h-full overflow-y-scroll"
     >
       <ResizablePanel
-        className="md:min-w-[270px]"
+        className="md:min-w-[270px] min-h-full"
         defaultSize={20}
         minSize={20}
         maxSize={35}

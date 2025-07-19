@@ -4,8 +4,6 @@ import Hint from "./Hint";
 import EmojiPopover from "./EmojiPopover";
 import { Id } from "../../convex/_generated/dataModel";
 import { cn } from "@/lib/utils";
-import UseCurrentMember from "@/features/workspace/api/useCurrentMember";
-import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId";
 import { useDeleteMessage } from "@/features/messages/api/useDeleteMessage";
 import { toast } from "sonner";
 import UseConfirm from "./hooks/useConfirm";
@@ -46,7 +44,10 @@ const Toolbar = ({
     DeleteMessage(
       { message },
       {
-        onSuccess() {
+        onSuccess(id) {
+          if(parentId == id){
+            setParentId(null)
+          }
           toast.success("Message Deleted");
         },
         onError() {

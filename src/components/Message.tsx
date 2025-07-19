@@ -10,6 +10,8 @@ import { useMessageReaction } from "@/features/reactions/api/useMessageReact";
 import { toast } from "sonner";
 import ShowReactions from "./Reactions";
 import { ReactionsWithoutMembers } from "@/lib/message.lib";
+import ThreadBar from "./ThreadBar";
+import { useParentId } from "@/features/thread/store/useParentId";
 
 const Renderer = dynamic(() => import("./Renderer"));
 
@@ -29,7 +31,11 @@ interface MessageProps {
   authorImage: string | null;
   creationTime: number;
   updated: number | null;
-  reactions: ReactionsWithoutMembers  | [];
+  reactions: ReactionsWithoutMembers | [];
+  threadCount: number;
+  threadImage: string | null;
+  threadTimestamp: number;
+  threadName?: string;
 }
 
 const FormatFullTime = (date: Date) =>
@@ -49,11 +55,20 @@ const Message = ({
   setEdit,
   IsCreating,
   updated,
-  setIsCreating,
   reactions,
-  isThread = false
+  threadCount,
+  threadImage,
+  threadTimestamp,
+  threadName,
+  isThread = false,
 }: MessageProps) => {
   const { mutate: AddReaction, IsPending: IsReacting } = useMessageReaction();
+
+  const [_,setParentId] = useParentId()
+
+  function OnThreadBarClick(){
+    setParentId(id)
+  }
 
   function HandleOnEdit() {
     if (IsCreating) return;
@@ -87,7 +102,7 @@ const Message = ({
         <div className="logo-or shrink-0 w-12 aspect-square flex justify-center items-center">
           <Avatar className="rounded-sm w-full h-full">
             <AvatarFallback className="bg-amber-500 text-white text-2xl">
-              <p>{authorName.charAt(0).toUpperCase()}</p>
+              <p>{authorName?.charAt(0).toUpperCase() || "M"}</p>
             </AvatarFallback>
             <AvatarImage
               className="outline-none h-full w-full border-none select-none rounded-sm"
@@ -109,9 +124,13 @@ const Message = ({
             <Renderer content={content} />
             {image && !isThread && <Thumbnail url={image} />}
             {updated && <p className="text-sm text-muted-foreground">Edited</p>}
-            <ShowReactions
-              reactions={reactions}
-              onChange={HandleOnReact}
+            <ShowReactions reactions={reactions} onChange={HandleOnReact} />
+            <ThreadBar
+              count={threadCount}
+              image={threadImage}
+              timestamp={threadTimestamp}
+              name={threadName}
+              onClick={OnThreadBarClick}
             />
           </div>
         </div>
@@ -139,9 +158,13 @@ const Message = ({
           <Renderer content={content} />
           {image && !isThread && <Thumbnail url={image} />}
           {updated && <p className="text-sm text-muted-foreground">Edited</p>}
-          <ShowReactions
-              reactions={reactions}
-              onChange={HandleOnReact}
+          <ShowReactions reactions={reactions} onChange={HandleOnReact} />
+          <ThreadBar
+              count={threadCount}
+              image={threadImage}
+              timestamp={threadTimestamp}
+              name={threadName}
+              onClick={OnThreadBarClick}
             />
         </div>
         <Toolbar

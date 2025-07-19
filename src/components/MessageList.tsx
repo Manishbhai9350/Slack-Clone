@@ -3,7 +3,6 @@ import { Loader } from "lucide-react";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import UseCurrentMember from "@/features/workspace/api/useCurrentMember";
-import { useGetChannel } from "@/features/channels/api/useGetChannel";
 import { useGetChannels } from "@/features/channels/api/useGetChannels";
 import { useGetChannelId } from "@/features/channels/hooks/useChannelId";
 import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId";
@@ -30,9 +29,6 @@ const MessageList = ({ variant, conversation, parent, setIsEdit, IsEdit, setEdit
 
   const { Data: Channels, IsLoading: ChannelsLoading } = useGetChannels({
     workspaceId,
-  });
-  const { IsLoading: ChannelDataLoading } = useGetChannel({
-    id: channelId,
   });
   const { Data: CurrentMember } = UseCurrentMember({
     workspaceId: workspaceId,
@@ -63,7 +59,7 @@ const MessageList = ({ variant, conversation, parent, setIsEdit, IsEdit, setEdit
     return () => {};
   }, [Channel, ChannelsLoading, Router, workspaceId]);
 
-  if (ChannelsLoading || ChannelDataLoading) {
+  if (ChannelsLoading) {
     return (
       <div className="w-full h-full flex flex-col justify-center items-center gap-y-2">
         <Loader className="animate-spin" />
@@ -112,6 +108,10 @@ const MessageList = ({ variant, conversation, parent, setIsEdit, IsEdit, setEdit
                         updated={msg.updated}
                         reactions={msg.reactions || []}
                         isThread={variant == 'threads'}
+                        threadCount={msg.threadCount}
+                        threadImage={msg.threadImage}
+                        threadTimestamp={msg.threadTimestamp}
+                        threadName={msg.threadName}
                       />
                     );
                   })}

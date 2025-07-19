@@ -22,6 +22,10 @@ export type MessageType = {
   updated:number | null;
   message:string;
   image:string | undefined;
+  threadCount: number;
+  threadImage: string | null;
+  threadTimestamp: number;
+  threadName?:string;
 };
 
 type GroupedMessages = {
