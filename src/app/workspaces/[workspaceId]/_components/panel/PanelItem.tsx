@@ -9,7 +9,7 @@ interface PanelItemProps {
   isActive?: boolean;
   icon: LucideIcon;
   label: string;
-  id:Id<'channels'>
+  id?:Id<'channels'> | Id<'members'>
 }
 
 const PanelItem = ({ isActive = false, icon: Icon, label, id }: PanelItemProps) => {
