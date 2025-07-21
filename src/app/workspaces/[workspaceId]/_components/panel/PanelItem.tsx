@@ -2,11 +2,14 @@ import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
+import { Id } from "../../../../../../convex/_generated/dataModel";
+import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId";
 
 interface PanelItemProps {
   isActive?: boolean;
   icon: LucideIcon;
   label: string;
+  id:Id<'channels'>
 }
 
 const PanelItem = ({ isActive = false, icon: Icon, label, id }: PanelItemProps) => {
