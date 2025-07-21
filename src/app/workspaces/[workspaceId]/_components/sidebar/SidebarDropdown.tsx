@@ -12,28 +12,28 @@ import { useWorkspaceAtom } from "@/features/workspace/hooks/useWorkSpace";
 
 
 
-import { Loader, Plug, Plus, PlusSquare, PlusSquareIcon, TriangleAlert } from "lucide-react";
+import { Loader, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 
 const SidebarDropDown = () => {
-  const [open, setOpen] = useWorkspaceAtom();
+  const [_, setOpen] = useWorkspaceAtom();
   const workspaceId = useGetWorkspaceId();
 
   const router = useRouter();
 
-  const { Data: Workspaces, IsLoading: IsWorkspacesLoading } = useWorkspaces();
+  const { Data: Workspaces } = useWorkspaces();
   const { Data: Workspace, IsLoading: IsWorkspaceLoading } = useGetWorkSpace({
     workspaceId,
   });
 
-  function HandleCreateWorkspace(e) {
+  function HandleCreateWorkspace() {
     setOpen(true);
   }
 
   const FilteredWorkspaces = useMemo(
     () => Workspaces?.filter((workspace) => workspace._id !== workspaceId),
-    [Workspaces]
+    [Workspaces,workspaceId]
   );
   return (
     <DropdownMenu>

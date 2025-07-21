@@ -28,7 +28,7 @@ const SignUpForm = ({ setForm }: SignUpProps) => {
   const [ConfirmPassword, setConfirmPassword] = useState("");
   const [IsLoading, setIsLoading] = useState<boolean>(false);
   const [Error, setError] = useState("");
-  const [TimeOutId, setTimeOutId] = useState();
+  const [TimeOutId, setTimeOutId] = useState<NodeJS.Timeout>();
 
   const { signIn } = useAuthActions();
 
@@ -45,7 +45,7 @@ const SignUpForm = ({ setForm }: SignUpProps) => {
     }
     setIsLoading(true);
     signIn("password", { email: Email, password: Password, name:Name, flow: "signUp" })
-      .catch((e) => {
+      .catch(() => {
         setError("Invalid Email or Password");
       })
       .finally(() => {
@@ -119,7 +119,7 @@ const SignUpForm = ({ setForm }: SignUpProps) => {
         <Separator />
         <div className="services flex flex-col space-y-2">
           <Button
-            onClick={(e) => HandleProvider("google")}
+            onClick={() => HandleProvider("google")}
             disabled={IsLoading}
             variant={"outline"}
             className="relative cursor-pointer"
@@ -128,7 +128,7 @@ const SignUpForm = ({ setForm }: SignUpProps) => {
             Continue With Google
           </Button>
           <Button
-            onClick={(e) => HandleProvider("github")}
+            onClick={() => HandleProvider("github")}
             disabled={IsLoading}
             variant={"outline"}
             className="relative cursor-pointer"
@@ -141,7 +141,7 @@ const SignUpForm = ({ setForm }: SignUpProps) => {
       <CardFooter className="p-0 m-0">
         <p>Already have an account?&nbsp;</p>{" "}
         <span
-          onClick={(e) => setForm("signin")}
+          onClick={() => setForm("signin")}
           className="text-blue-300 hover:text-blue-500 cursor-pointer"
         >
           Login

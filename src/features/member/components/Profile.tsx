@@ -33,7 +33,7 @@ const Profile = ({
   const {Data:Profile,IsLoading:IsProfileLoading} = useGetMember({id:member})
   const {Data:CurrentMember,IsLoading:CurrentMemberLoading} = useGetCurrentMember({workspace:workspaceId})
   const {mutate:UpdateMember,IsPending:IsUpdatingMember} = useUpdateMember()
-  const {mutate:RemoveMember,IsPending:IsRemovingMember} = useRemoveMember()
+  const {mutate:RemoveMember} = useRemoveMember()
   
   const [confirm,RoleConfirm] = UseConfirm()
   

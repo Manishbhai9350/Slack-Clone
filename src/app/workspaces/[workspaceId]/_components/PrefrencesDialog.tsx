@@ -32,7 +32,7 @@ const PrefrencesDialog = ({
 
    const WorkspaceId = useGetWorkspaceId()
 
-  const {mutate:Remove,IsPending:IsRemoving} = useRemoveWorkSpace()
+  const {mutate:Remove} = useRemoveWorkSpace()
 
   const [Confirm,ConfirmDialog] = UseConfirm()
 
@@ -101,7 +101,7 @@ const EditName = ({
 
   const WorkspaceId = useGetWorkspaceId()
 
-  const {mutate:Update,IsPending:IsUpdating} = useUpdateWorkSpace()
+  const {mutate:Update} = useUpdateWorkSpace()
 
   const HandleClose = () => {
     setName(value);

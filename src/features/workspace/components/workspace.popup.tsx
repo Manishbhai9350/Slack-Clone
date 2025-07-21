@@ -21,7 +21,7 @@ const WorkSpacePopup = () => {
   const [IsMounted, setIsMounted] = useState(false);
   const [Name, setName] = useState("");
 
-  const { mutate, Data, state, IsPending, IsSuccess, IsError, IsSetteled } =
+  const { mutate, IsPending } =
     useCreateWorkSpace();
 
   const router = useRouter();
@@ -33,7 +33,7 @@ const WorkSpacePopup = () => {
   const HandleCreation = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (Name.length == 0) return;
-    const Data = mutate(
+    mutate(
       { name: Name },
       {
         onSuccess: (workspaceId) => {
@@ -48,7 +48,7 @@ const WorkSpacePopup = () => {
   if (!IsMounted) return null;
 
   return (
-    <Dialog open={open} onOpenChange={e => setOpen(false)}>
+    <Dialog open={open} onOpenChange={() => setOpen(false)}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create a Workspace</DialogTitle>

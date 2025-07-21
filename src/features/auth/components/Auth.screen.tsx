@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 import React, { useEffect, useState } from 'react'
 import SignUpForm from './SignUp.form'
@@ -7,13 +8,13 @@ import { useWorkspaceAtom } from '@/features/workspace/hooks/useWorkSpace';
 
 const AuthScreen = () => {
     const [Form, setForm] = useState<AuthType>('signin')
-    const [open,setOpen] = useWorkspaceAtom()
+    const [_,setOpen] = useWorkspaceAtom()
     useEffect(() => {
       setOpen(false)
       return () => {
         
       }
-    }, [])
+    }, [setOpen])
     
   return (
     <main className='w-full h-screen bg-zinc-800 text-black flex justify-center items-center'>

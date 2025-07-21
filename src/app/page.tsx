@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { useEffect, useMemo } from "react";
 import UserAvatar from "@/features/auth/components/UserAvatar";
@@ -7,7 +8,7 @@ import { useRouter } from "next/navigation";
 
 
 export default function Home() {
-  const { Data, IsLoading } = useWorkspaces();
+  const { Data} = useWorkspaces();
   const [_, setOpen] = useWorkspaceAtom();
 
   const router = useRouter()

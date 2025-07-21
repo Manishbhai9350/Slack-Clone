@@ -130,7 +130,7 @@ const Editor = ({
         quillRef.current = null;
       }
     };
-  }, []);
+  }, [innerRef]);
 
   useEffect(() => {
     if (disabled) {

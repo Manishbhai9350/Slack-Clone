@@ -2,15 +2,12 @@ import { Loader, Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
-  Command,
   CommandDialog,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
-  CommandShortcut,
 } from "@/components/ui/command"
 import { useState } from "react";
 import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId";
@@ -74,7 +71,7 @@ const WorkspaceNav = () => {
                   <CommandGroup heading="Members">
                     {
                       Members.map(member => (
-                        <CommandItem onSelect={() => OnMemberSelect(member._id)} key={member._id}>{member.User.name}</CommandItem>
+                        <CommandItem onSelect={() => OnMemberSelect(member._id)} key={member._id}>{member?.User?.name }</CommandItem>
                       ))
                     }
                   </CommandGroup>

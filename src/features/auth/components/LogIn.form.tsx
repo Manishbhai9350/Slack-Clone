@@ -31,7 +31,7 @@ const LoginForm = ({setForm}:LoginProps) => {
   const [Password, setPassword] = useState('')
   const [IsLoading, setIsLoading] = useState<boolean>(false)
   const [Error, setError] = useState('')
-  const [TimeOutId, setTimeOutId] = useState(null)
+  const [TimeOutId, setTimeOutId] = useState<NodeJS.Timeout>()
 
   const {signIn} = useAuthActions()
 
@@ -98,7 +98,7 @@ const LoginForm = ({setForm}:LoginProps) => {
             <div className="services flex flex-col space-y-2">
               <Button
                 disabled={IsLoading}
-                onClick={e => HandleProvider('google')}
+                onClick={() => HandleProvider('google')}
                 variant={"outline"}
                 className="relative cursor-pointer"
                 >
@@ -107,7 +107,7 @@ const LoginForm = ({setForm}:LoginProps) => {
               </Button>
               <Button
                 disabled={IsLoading}
-                onClick={e => HandleProvider('github')}
+                onClick={() => HandleProvider('github')}
                 variant={"outline"}
                 className="relative cursor-pointer"
                 >
@@ -117,7 +117,7 @@ const LoginForm = ({setForm}:LoginProps) => {
             </div>
           </CardContent>
           <CardFooter className="p-0 m-0">
-            <p>Don&apos;t have an account ?&nbsp;</p> <span onClick={e => setForm('signup')} className="text-blue-300 hover:text-blue-500 cursor-pointer">Signup</span>
+            <p>Don&apos;t have an account ?&nbsp;</p> <span onClick={() => setForm('signup')} className="text-blue-300 hover:text-blue-500 cursor-pointer">Signup</span>
           </CardFooter>
         </Card>
   );

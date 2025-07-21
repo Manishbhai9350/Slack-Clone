@@ -4,7 +4,7 @@ import { Id } from "../../../../convex/_generated/dataModel";
 
 interface GetWorkspaceProps {
   channel?: Id<"channels">;
-  parent?: Id<"messages">;
+  parent?: Id<"messages"> | null;
   conversation?: Id<"conversations">;
 }
 

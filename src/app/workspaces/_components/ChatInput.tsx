@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useGetChannelId } from "@/features/channels/hooks/useChannelId";
 import { useCreateMessage } from "@/features/messages/api/useCreateMessage";
 import { useGenerateUploadUrl } from "@/features/upload/api/useGenerateUploadUrl";
@@ -23,7 +24,7 @@ interface ChatInputProps {
 }
 
 
-const ChatInput = ({isEdit,editValue,onUpdate,onUpdateCancel,updatePending,IsCreating,setIsCreating,variant,conversation}:ChatInputProps) => {
+const ChatInput = ({isEdit,editValue,onUpdate,onUpdateCancel,updatePending,IsCreating,setIsCreating,conversation}:ChatInputProps) => {
   const workspaceId = useGetWorkspaceId();
   const channelId = useGetChannelId();
 
@@ -55,7 +56,7 @@ const ChatInput = ({isEdit,editValue,onUpdate,onUpdateCancel,updatePending,IsCre
       message: StringValue,
       workspace: workspaceId,
       channel: channelId,
-      image: undefined,
+      image: null,
       conversation
     };
 
@@ -74,13 +75,13 @@ const ChatInput = ({isEdit,editValue,onUpdate,onUpdateCancel,updatePending,IsCre
           const { storageId } = await result.json();
           Values.image = storageId;
         } catch (error) {
-          
+          Values.image = null;
         }
       }
     }
 
     CreateMessage(Values, {
-      onSuccess(messageId) {
+      onSuccess() {
         toast.success("Message Send Successfully");
       },
       onError() {

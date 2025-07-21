@@ -1,4 +1,3 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,13 +21,12 @@ const  UserAvatar = () => {
       </div>
     );
 
-  const { name, email } = user;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <div className="w-12 aspect-square">
-          <UserIcon name={name} image={user?.image | ''} />
+          <UserIcon name={user?.name || ''} image={user?.image || ''} />
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">

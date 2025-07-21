@@ -7,11 +7,9 @@ import { useGetChannels } from "@/features/channels/api/useGetChannels";
 import UseCurrentMember from "../api/useCurrentMember";
 import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { useGetMessages } from "@/features/messages/api/useGetMessages";
 
 const WorkSpacePage = () => {
   const workspaceId = useGetWorkspaceId();
-  const { Data, IsLoading } = useGetWorkSpace({ workspaceId });
 
   const [createChannelOpen, setCreateChannelOpen] = useChannelAtom();
 

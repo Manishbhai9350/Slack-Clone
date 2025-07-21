@@ -18,6 +18,6 @@ export const useGetChannels = ({ workspaceId }: GetChannelsProps) => {
 
     return { Data, IsLoading };
   } catch (error) {
-    return { Data: null, IsLoading: false };
+    return { Data: null, IsLoading: false,error };
   }
 };

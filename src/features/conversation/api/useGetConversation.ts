@@ -18,6 +18,6 @@ export const useGetConversation = ({ id }: GetConversationProps) => {
 
     return { Data, IsLoading };
   } catch (error) {
-    return { Data: null, IsLoading: false };
+    return { Data: null, IsLoading: false, error };
   }
 };

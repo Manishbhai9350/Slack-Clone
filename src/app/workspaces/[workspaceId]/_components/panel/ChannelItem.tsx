@@ -13,7 +13,7 @@ interface ChannelItemProps {
   id:Id<'channels'>;
 }
 
-const ChannelItem = ({ isActive = false, icon: Icon, label, id }: ChannelItemProps) => {
+const ChannelItem = ({ icon: Icon, label, id }: ChannelItemProps) => {
   const workspaceId = useGetWorkspaceId();
   const channelId = useGetChannelId()
 

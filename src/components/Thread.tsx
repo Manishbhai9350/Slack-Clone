@@ -5,7 +5,7 @@ import Message from "./Message";
 import UseCurrentMember from "@/features/workspace/api/useCurrentMember";
 import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId";
 import { useGetThread } from "@/features/thread/api/useGetThread";
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Quill, { Delta } from "quill";
 import { useCreateMessage } from "@/features/messages/api/useCreateMessage";
 import { useGetChannelId } from "@/features/channels/hooks/useChannelId";
@@ -13,15 +13,11 @@ import { useParentId } from "@/features/thread/store/useParentId";
 import { toast } from "sonner";
 import { useUpdateMessage } from "@/features/messages/api/useUpdateMessage";
 import dynamic from "next/dynamic";
-import { differenceInSeconds } from "date-fns";
 import { useGetMessages } from "@/features/messages/api/useGetMessages";
-import { groupMessagesByDate } from "@/lib/message.lib";
 import MessageList from "./MessageList";
-import ConversationPage from "@/features/conversation/components/conversationPage";
 
 const Editor = dynamic(() => import("./Editor"), { ssr: false });
 
-const TIME_THRESHOLD = 30;
 
 interface ThreadProps {
   message: Id<"messages">;
@@ -32,9 +28,7 @@ const Thread = ({ message, onCancel }: ThreadProps) => {
   const workspaceId = useGetWorkspaceId();
   const ChannelId = useGetChannelId();
 
-  console.log(message)
-
-  const [parentId, setParentId] = useParentId();
+  const [parentId] = useParentId();
 
   const { Data: CurrentMember } = UseCurrentMember({ workspace:workspaceId });
   const { Data: CurrentMessage, IsLoading:IsCurrentMessageLoading } = useGetThread({

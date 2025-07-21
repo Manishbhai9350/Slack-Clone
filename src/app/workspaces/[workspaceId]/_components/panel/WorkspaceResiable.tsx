@@ -116,7 +116,7 @@ function PanelSideBar() {
   const workspaceId = useGetWorkspaceId();
 
 
-  const [_open, setOpen] = useChannelAtom();
+  const [_, setOpen] = useChannelAtom();
 
   const { Data: Workspace, IsLoading: WorkspaceLoading } = useGetWorkSpace({
     workspaceId,
@@ -127,7 +127,7 @@ function PanelSideBar() {
   const { Data: Member, IsLoading: MemberLoading } = UseCurrentMember({
     workspace:workspaceId
   });
-  const { Data: Members, IsLoading: MembersLoading } = useGetMembers({
+  const { Data: Members } = useGetMembers({
     workspaceId,
   });
   const OtherMemberId = useGetOtherMemberId()
@@ -251,7 +251,7 @@ function PanelSideBarHeader({
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem
-                onClick={(e) => setInviteModalOpen(true)}
+                onClick={() => setInviteModalOpen(true)}
                 className="cursor-pointer overflow-hidden "
               >
                 <p className="truncate">Invite People To {workspace.name}</p>

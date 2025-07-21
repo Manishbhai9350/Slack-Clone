@@ -46,7 +46,7 @@ const JoinPage = () => {
         toast.success('Successfully Joined To '+Data?.name)
         Router.replace(`/workspaces/${workspaceId}`)
       },
-      onError(e){
+      onError(){
         toast.error('Failed To Join '+Data?.name)
       },
       throwError:true

@@ -1,5 +1,4 @@
 import { cn } from "@/lib/utils";
-import { Home } from "lucide-react";
 
 const SidebarButton = ({ icon: Icon, text='', isActive = false   }) => {
   return (

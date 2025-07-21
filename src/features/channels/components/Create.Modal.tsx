@@ -51,7 +51,7 @@ const CreateChannelModel = () => {
           toast.success("Channel Created");
           Router.push(`/workspaces/${workspaceId}/channel/${channelId}`)
         },
-        onError:(error) => {
+        onError:() => {
           toast.error('Failed To Create Channel')
         }
       }
