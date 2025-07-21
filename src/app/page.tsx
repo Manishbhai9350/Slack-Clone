@@ -3,11 +3,14 @@ import { useEffect, useMemo } from "react";
 import UserAvatar from "@/features/auth/components/UserAvatar";
 import { useWorkspaces } from "@/features/workspace/api/useWorkspaces";
 import { useWorkspaceAtom } from "@/features/workspace/hooks/useWorkSpace";
+import { useRouter } from "next/navigation";
 
 
 export default function Home() {
   const { Data, IsLoading } = useWorkspaces();
   const [_, setOpen] = useWorkspaceAtom();
+
+  const router = useRouter()
 
 
   const WorkSpaceId = useMemo(() => Data?.[0]?._id,[Data])
@@ -18,8 +21,9 @@ export default function Home() {
       setOpen(true)
     } else {
       setOpen(false)
+      router.replace(`/workspaces/${WorkSpaceId}`)
     }
-  }, [WorkSpaceId])
+  }, [WorkSpaceId,router,setOpen])
   
 
   return (

@@ -10,7 +10,8 @@ interface Threads {
   count: number;
   image: string | null;
   timestamp: number;
-  name?:string;
+  name?: string;
+  member: Id<'members'> | string;
 }
 
 const populateThread = async (
@@ -27,7 +28,8 @@ const populateThread = async (
       count: 0,
       image: null,
       timestamp: 0,
-      name:''
+      name: "",
+      member:""
     };
   }
 
@@ -35,7 +37,8 @@ const populateThread = async (
     count: 0,
     image: null,
     timestamp: 0,
-    name:''
+    name: "",
+    member:""
   };
 
   const LastMessage = Messages[Messages.length - 1];
@@ -54,6 +57,7 @@ const populateThread = async (
   ThreadData.image = LastUser.image || null;
   ThreadData.timestamp = LastMessage._creationTime;
   ThreadData.name = LastUser.name;
+  ThreadData.member = LastMember._id;
 
   return ThreadData;
 };
@@ -169,7 +173,6 @@ export const getById = query({
       image = await ctx.storage.getUrl(message.image);
     }
 
-
     return {
       ...message,
       reactions: deduptReactions(reactions),
@@ -183,7 +186,7 @@ export const getById = query({
 
 export const get = query({
   args: {
-    channel: v.optional(v.id('channels')),
+    channel: v.optional(v.id("channels")),
     parent: v.optional(v.id("messages")),
     conversation: v.optional(v.id("conversations")),
     paginationOpts: paginationOptsValidator,
@@ -193,19 +196,18 @@ export const get = query({
     if (!UserId) {
       return null;
     }
-    
+
     let _conversation = args?.conversation;
 
-    if(!args?.conversation && args.parent && !args?.channel){
-      const parentMessage = await ctx.db.get(args.parent)
-      
-      if(!parentMessage){
+    if (!args?.conversation && args.parent && !args?.channel) {
+      const parentMessage = await ctx.db.get(args.parent);
+
+      if (!parentMessage) {
         return null;
       }
 
-      _conversation = parentMessage.conversation
+      _conversation = parentMessage.conversation;
     }
-
 
     const results = await ctx.db
       .query("messages")
@@ -217,7 +219,6 @@ export const get = query({
       )
       .order("desc")
       .paginate(args.paginationOpts); // 👈 Keep as-is
-
 
     return {
       ...results,
@@ -286,7 +287,8 @@ export const get = query({
               threadCount: thread.count,
               threadImage: thread.image,
               threadTimestamp: thread.timestamp,
-              threadName:thread.name
+              threadName: thread.name,
+              threadMember: thread.member,
             };
           })
         )
@@ -318,16 +320,15 @@ export const create = mutation({
 
     let _conversation = args?.conversation;
 
-    if(!args?.conversation && args.parent && !args?.channel){
-      const parentMessage = await ctx.db.get(args.parent)
-      
-      if(!parentMessage){
+    if (!args?.conversation && args.parent && !args?.channel) {
+      const parentMessage = await ctx.db.get(args.parent);
+
+      if (!parentMessage) {
         return null;
       }
 
-      _conversation = parentMessage.conversation
+      _conversation = parentMessage.conversation;
     }
-
 
     const CreatedMessageId = await ctx.db.insert("messages", {
       message: args.message,
@@ -444,6 +445,27 @@ export const remove = mutation({
     // Removing Associated Image
     if (Message.image) {
       await ctx.storage.delete(Message.image);
+    }
+
+    
+    const [messages, reactions] = await Promise.all([
+      ctx.db
+        .query("messages")
+        .withIndex("by_parent", (q) => q.eq("parent", Message._id))
+        .collect(),
+      ctx.db
+        .query("reactions")
+        .withIndex("by_message", (q) => q.eq("message", Message._id))
+        .collect(),
+    ]);
+
+    // Removing Associated Replies
+    for (const message of messages) {
+      await ctx.db.delete(message._id);
+    }
+    // Removing Associated Reactions
+    for (const reaction of reactions) {
+      await ctx.db.delete(reaction._id);
     }
 
     // Deleting The Message

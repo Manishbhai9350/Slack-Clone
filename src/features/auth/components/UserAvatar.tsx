@@ -8,6 +8,7 @@ import {
 import { useAuthActions } from "@convex-dev/auth/react";
 import { Loader, LogOut } from "lucide-react";
 import { useUser } from "../api/auth.user";
+import UserIcon from "@/components/UserAvatar";
 
 const  UserAvatar = () => {
   const { signOut } = useAuthActions();
@@ -25,24 +26,17 @@ const  UserAvatar = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className="w-12 aspect-square">
-        <Avatar className="w-full h-full outline-none border-none cursor-pointer">
-          <AvatarFallback className="bg-amber-500 text-white text-2xl">
-            <p>{name.charAt(0).toUpperCase()}</p>
-          </AvatarFallback>
-          <AvatarImage
-            className="outline-none h-full w-full border-none select-none"
-            alt="Avatar"
-            src={user?.image}
-          />
-        </Avatar>
+      <DropdownMenuTrigger asChild>
+        <div className="w-12 aspect-square">
+          <UserIcon name={name} image={user?.image | ''} />
+        </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
         <DropdownMenuItem
           className="cursor-pointer size-8 opacity-75 hover:opacity-100 transition"
           onClick={() => signOut()}
         >
-          <LogOut className="hover:bg-none " />
+          <LogOut className="hover:bg-none" />
           <p>Logout</p>
         </DropdownMenuItem>
       </DropdownMenuContent>

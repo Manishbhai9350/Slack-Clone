@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import React from "react";
 import { Id } from "../../../../../../convex/_generated/dataModel";
+import UserIcon from "@/components/UserAvatar";
 
 interface PanelMemberItemProps {
   isActive?: boolean;
@@ -31,17 +32,10 @@ const PanelMemberItem = ({
           : "hover:bg-white/70 hover:text-slate-800 text-white"
       )}
     >
-      <div className="flex items-center justify-between gap-2 ">
-        <Avatar>
-          <AvatarFallback className="bg-amber-500 text-white text-2xl">
-            <p>{name.charAt(0).toUpperCase()}</p>
-          </AvatarFallback>
-          <AvatarImage
-            className="outline-none h-full w-full border-none select-none"
-            alt="Avatar"
-            src={image}
-          />
-        </Avatar>
+      <div className="flex items-center justify-between gap-2">
+        <div className="w-10 aspect-square">
+          <UserIcon name={name} image={image} />
+        </div>
         <p className="text-xl truncate">{name}</p>
       </div>
     </Link>

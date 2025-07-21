@@ -4,13 +4,14 @@ import { Id } from "../../../../convex/_generated/dataModel";
 
 
 interface UseCurrentMemberProps {
-    workspaceId:Id<'workspaces'>
+    workspace:Id<'workspaces'>
 }
 
 
-const UseCurrentMember = ({workspaceId}:UseCurrentMemberProps) => {
+const UseCurrentMember = ({workspace}:UseCurrentMemberProps) => {
 
-    const Member = useQuery(api.member.current,{workspaceId})
+
+    const Member = useQuery(api.member.current,{workspace})
 
     if(typeof Member == 'undefined') return {Data:null,IsLoading:true}
     else if(!Member) return {Data:null,IsLoading:false}

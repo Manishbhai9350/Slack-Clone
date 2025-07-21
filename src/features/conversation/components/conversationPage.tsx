@@ -3,7 +3,7 @@ import { Id } from "../../../../convex/_generated/dataModel";
 import { useGetConversation } from "../api/useGetConversation";
 import { useGetMessages } from "@/features/messages/api/useGetMessages";
 import Header from "./ConversationHeader";
-import { useGetMember } from "@/features/reactions/api/useGetmember";
+import { useGetMember } from "@/features/member/api/useGetmember";
 import { useGetOtherMemberId } from "../hooks/useGetOtherMember";
 import { useState } from "react";
 import { toast } from "sonner";

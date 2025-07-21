@@ -19,7 +19,7 @@ interface ReactionsProps {
 
 const Reactions = ({ reactions, onChange }: ReactionsProps) => {
   const workspaceId = useGetWorkspaceId();
-  const { Data: CurrentMember } = UseCurrentMember({ workspaceId });
+  const { Data: CurrentMember } = UseCurrentMember({ workspace:workspaceId });
 
   if (!reactions || reactions.length == 0) return null;
 

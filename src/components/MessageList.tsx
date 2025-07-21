@@ -31,7 +31,7 @@ const MessageList = ({ variant, conversation, parent, setIsEdit, IsEdit, setEdit
     workspaceId,
   });
   const { Data: CurrentMember } = UseCurrentMember({
-    workspaceId: workspaceId,
+    workspace: workspaceId,
   });
 
   const {
@@ -89,6 +89,7 @@ const MessageList = ({ variant, conversation, parent, setIsEdit, IsEdit, setEdit
                         new Date(msg._creationTime),
                         new Date(PrevMessage._creationTime)
                       ) < 20;
+                      console.log(msg.threadMember)
                     return (
                       <Message
                         id={msg._id}
@@ -112,6 +113,8 @@ const MessageList = ({ variant, conversation, parent, setIsEdit, IsEdit, setEdit
                         threadImage={msg.threadImage}
                         threadTimestamp={msg.threadTimestamp}
                         threadName={msg.threadName}
+                        threadMember={msg.threadMember}
+                        member={msg?.member?._id}
                       />
                     );
                   })}

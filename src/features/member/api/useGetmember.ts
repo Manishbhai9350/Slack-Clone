@@ -3,11 +3,11 @@ import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { Id } from "../../../../convex/_generated/dataModel";
 
-interface GetWorkspaceProps {
+interface useGetMemberProps {
   id: Id<"members">;
 }
 
-export const useGetMember = ({ id }: GetWorkspaceProps) => {
+export const useGetMember = ({ id }: useGetMemberProps) => {
   try {
     const Data = useQuery(api.member.getById, { id });
 

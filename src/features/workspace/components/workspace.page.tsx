@@ -22,7 +22,7 @@ const WorkSpacePage = () => {
     workspaceId,
   });
   const { Data: Member, IsLoading: MemberLoading } = UseCurrentMember({
-    workspaceId,
+    workspace:workspaceId,
   });
 
   const Router = useRouter();

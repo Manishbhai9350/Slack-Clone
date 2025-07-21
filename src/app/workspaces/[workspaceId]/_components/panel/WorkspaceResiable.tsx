@@ -41,15 +41,23 @@ import ChannelItem from "./ChannelItem";
 import { useParentId } from "@/features/thread/store/useParentId";
 import Thread from "@/components/Thread";
 import { useGetOtherMemberId } from "@/features/conversation/hooks/useGetOtherMember";
+import { useMemberProfileId } from "@/features/member/store/useParentId";
+import Profile from "@/features/member/components/Profile";
 
 export default function WorkspacePanel({ children }: { children: ReactNode }) {
 
 
   const [parentId, setParentId] = useParentId();
+  const [profileId, setProfileId] = useMemberProfileId();
 
-  function OnThreadCancel(){
+
+  function onPanelCancel(){
     setParentId(null)
+    setProfileId(null)
   }
+
+
+  const IsPanelOpen = !!parentId || !!profileId;
 
   return (
     <ResizablePanelGroup
@@ -77,7 +85,7 @@ export default function WorkspacePanel({ children }: { children: ReactNode }) {
       >
         {children}
       </ResizablePanel>
-      {parentId && (
+      {IsPanelOpen && (
         <>
           <ResizableHandle withHandle />
           <ResizablePanel
@@ -87,7 +95,16 @@ export default function WorkspacePanel({ children }: { children: ReactNode }) {
             maxSize={45}
             color="#313131"
           >
-            <Thread onCancel={OnThreadCancel} message={parentId as Id<'messages'>} />
+            {
+              parentId && (
+                <Thread onCancel={onPanelCancel} message={parentId as Id<'messages'>} />
+              )
+            } 
+            {
+              profileId && (
+                <Profile onCancel={onPanelCancel} member={profileId as Id<'members'>} />
+              )
+            }
           </ResizablePanel>
         </>
       )}
@@ -98,6 +115,7 @@ export default function WorkspacePanel({ children }: { children: ReactNode }) {
 function PanelSideBar() {
   const workspaceId = useGetWorkspaceId();
 
+
   const [_open, setOpen] = useChannelAtom();
 
   const { Data: Workspace, IsLoading: WorkspaceLoading } = useGetWorkSpace({
@@ -107,7 +125,7 @@ function PanelSideBar() {
     workspaceId,
   });
   const { Data: Member, IsLoading: MemberLoading } = UseCurrentMember({
-    workspaceId,
+    workspace:workspaceId
   });
   const { Data: Members, IsLoading: MembersLoading } = useGetMembers({
     workspaceId,

@@ -26,6 +26,7 @@ export type MessageType = {
   threadImage: string | null;
   threadTimestamp: number;
   threadName?:string;
+  threadMember:Id<'members'>;
 };
 
 type GroupedMessages = {

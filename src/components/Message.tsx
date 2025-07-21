@@ -1,10 +1,9 @@
 import dynamic from "next/dynamic";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { format, isToday, isYesterday } from "date-fns";
 import Hint from "./Hint";
 import Thumbnail from "./Thumbnail";
 import Toolbar from "./Toolbar";
-import { Doc, Id } from "../../convex/_generated/dataModel";
+import { Id } from "../../convex/_generated/dataModel";
 import { Dispatch, SetStateAction } from "react";
 import { useMessageReaction } from "@/features/reactions/api/useMessageReact";
 import { toast } from "sonner";
@@ -12,11 +11,14 @@ import ShowReactions from "./Reactions";
 import { ReactionsWithoutMembers } from "@/lib/message.lib";
 import ThreadBar from "./ThreadBar";
 import { useParentId } from "@/features/thread/store/useParentId";
+import UserIcon from "./UserAvatar";
+import { useMemberProfileId } from "@/features/member/store/useParentId";
 
 const Renderer = dynamic(() => import("./Renderer"));
 
 interface MessageProps {
   id: Id<"messages">;
+  member: Id<"members">;
   isEdit: null | Id<"messages">;
   setEditValue: Dispatch<SetStateAction<string>>;
   setEdit: Dispatch<SetStateAction<Id<"messages"> | null>>;
@@ -36,6 +38,7 @@ interface MessageProps {
   threadImage: string | null;
   threadTimestamp: number;
   threadName?: string;
+  threadMember?:Id<'members'>
 }
 
 const FormatFullTime = (date: Date) =>
@@ -43,6 +46,7 @@ const FormatFullTime = (date: Date) =>
 
 const Message = ({
   id,
+  member,
   content,
   isCompact = false,
   authorImage,
@@ -61,13 +65,24 @@ const Message = ({
   threadTimestamp,
   threadName,
   isThread = false,
+  threadMember
 }: MessageProps) => {
   const { mutate: AddReaction, IsPending: IsReacting } = useMessageReaction();
 
   const [_,setParentId] = useParentId()
+  const [__, setProfileId] = useMemberProfileId();
+
 
   function OnThreadBarClick(){
+    setProfileId(null)
     setParentId(id)
+  }
+  
+  function OnProfileIconClick(id:Id<'members'>){
+    console.log(id)
+    if(!id) return;
+    setProfileId(id)
+    setParentId(null)
   }
 
   function HandleOnEdit() {
@@ -100,16 +115,7 @@ const Message = ({
     return (
       <div className="p-2 flex items-start gap-2 hover:bg-slate-100 transition relative group overflow-x-hidden">
         <div className="logo-or shrink-0 w-12 aspect-square flex justify-center items-center">
-          <Avatar className="rounded-sm w-full h-full">
-            <AvatarFallback className="bg-amber-500 text-white text-2xl">
-              <p>{authorName?.charAt(0).toUpperCase() || "M"}</p>
-            </AvatarFallback>
-            <AvatarImage
-              className="outline-none h-full w-full border-none select-none rounded-sm"
-              alt="Avatar"
-              src={authorImage}
-            />
-          </Avatar>
+          <UserIcon member={member} onClick={OnProfileIconClick} name={authorName || ''} image={authorImage} />
         </div>
         <div className="flex flex-col">
           <div className="name-time flex items-center gap-2">
@@ -131,6 +137,8 @@ const Message = ({
               timestamp={threadTimestamp}
               name={threadName}
               onClick={OnThreadBarClick}
+              onProfileClick={OnProfileIconClick}
+              member={threadMember}
             />
           </div>
         </div>
@@ -165,6 +173,8 @@ const Message = ({
               timestamp={threadTimestamp}
               name={threadName}
               onClick={OnThreadBarClick}
+              member={threadMember}
+              onProfileClick={OnProfileIconClick}
             />
         </div>
         <Toolbar

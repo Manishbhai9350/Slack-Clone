@@ -36,7 +36,7 @@ const Thread = ({ message, onCancel }: ThreadProps) => {
 
   const [parentId, setParentId] = useParentId();
 
-  const { Data: CurrentMember } = UseCurrentMember({ workspaceId });
+  const { Data: CurrentMember } = UseCurrentMember({ workspace:workspaceId });
   const { Data: CurrentMessage, IsLoading:IsCurrentMessageLoading } = useGetThread({
     id: message,
   });
