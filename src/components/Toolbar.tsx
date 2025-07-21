@@ -76,7 +76,7 @@ const Toolbar = ({
       <div className="flex gap-2">
         <EmojiPopover
           label="Reactions"
-          onEmojiSelect={(e: { native: string }) => onReact(e.native)}
+          onEmojiSelect={(Emoji: string) => onReact(Emoji)}
         >
           <Button disabled={IsDeletingMessage} variant="outline">
             <Smile className="size-4" />

@@ -63,11 +63,11 @@ const Editor = ({
       ?.classList?.toggle("hidden");
   }
 
-  function HandleEmojiInput(emoji: { native: string }) {
+  function HandleEmojiInput(emoji: string) {
     if (!quillRef.current) return;
     quillRef.current.insertText(
       quillRef.current.getSelection()?.index || 0,
-      emoji.native
+      emoji
     );
   }
 

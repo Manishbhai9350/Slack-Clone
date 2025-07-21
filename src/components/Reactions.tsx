@@ -55,7 +55,7 @@ const Reactions = ({ reactions, onChange }: ReactionsProps) => {
           </Hint>
         ))}
       <EmojiPopover
-        onEmojiSelect={(Emoji: { native: string }) => onChange(Emoji.native)}
+        onEmojiSelect={(Emoji: string) => onChange(Emoji)}
         label="Add Reaction"
       >
         <Button className="flex  hover:bg-slate-200 hover:border-blue-500  bg-slate-200 transition-all duration-200 px-2 py-[4px] cursor-pointer rounded-full border justify-evenly items-start h-fit w-fit gap-2 text-slate-500 hover:text-blue-500">

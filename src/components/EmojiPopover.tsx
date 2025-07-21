@@ -11,14 +11,14 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { ReactNode } from "react";
-import { Picker } from "emoji-mart";
+import Picker, { EmojiClickData } from "emoji-picker-react"
 
 interface EmojiPopoverProps {
   children: ReactNode;
   label: string;
-  onEmojiSelect: (emoji: any) => void;
+  onEmojiSelect: (emoji: string) => void;
 }
 
 const EmojiPopover = ({
@@ -26,35 +26,22 @@ const EmojiPopover = ({
   label,
   onEmojiSelect,
 }: EmojiPopoverProps) => {
-  const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-  if (!open) return;
+  const [open,setOpen] = useState(false)
+  const TimeOutID = useRef<null | NodeJS.Timeout>(null)
 
-  const timeoutId = setTimeout(() => {
-    const pickerContainer = document.querySelector(".emoji-picker-container");
+  function onSelect(data:EmojiClickData){
+    clearTimeout(TimeOutID.current)
 
-    if (!pickerContainer) return;
+    onEmojiSelect(data.emoji)
 
-
-    const picker = new Picker({
-      onEmojiSelect,
-      theme: "light",
-    });
-
-    pickerContainer.appendChild(picker);
-  }, 0);
-
-  return () => {
-    clearTimeout(timeoutId);
-    const pickerContainer = document.querySelector(".emoji-picker-container");
-    if (pickerContainer) pickerContainer.innerHTML = "";
-  };
-}, [open]);
-
+    TimeOutID.current = setTimeout(() => {
+      setOpen(false)
+    },500)
+  }
 
   return (
-    <TooltipProvider>
+    <TooltipProvider >
       <Popover open={open} onOpenChange={setOpen}>
         <Tooltip>
           <PopoverTrigger asChild>
@@ -63,6 +50,7 @@ const EmojiPopover = ({
           <TooltipContent>{label}</TooltipContent>
         </Tooltip>
         <PopoverContent  className="emoji-picker-container w-fit h-fit">
+          <Picker onEmojiClick={ e => onSelect(e)} />
         </PopoverContent>
       </Popover>
     </TooltipProvider>
