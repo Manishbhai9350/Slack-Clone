@@ -6,11 +6,14 @@ import { ChevronDown } from "lucide-react";
 interface HeaderProps {
   name: string | null | undefined;
   memberImage: string | undefined;
+  onClick:() => void;
 }
 
-function Header({ name, memberImage }: HeaderProps) {
+function Header({ name, memberImage, onClick }: HeaderProps) {
+
+
   return (
-    <div className="w-full h-12 px-5 border-b flex items-center gap-2">
+    <div onClick={onClick} className="w-full h-12 px-5 border-b flex items-center gap-2">
       <Button
         variant="outline"
         className="outline-none border-none hover:border-none active:border-none hover:outline-none active:outline-none cursor-pointer flex items-center gap-2 rounded-md text-4xl  text-black"

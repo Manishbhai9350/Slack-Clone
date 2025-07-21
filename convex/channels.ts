@@ -60,6 +60,8 @@ export const remove = mutation({
       throw new Error("Unauthorized");
     } 
 
+    
+
     await ctx.db.delete(args.id);
 
     return true;

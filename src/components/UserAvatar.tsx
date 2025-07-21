@@ -8,17 +8,18 @@ interface UserIconProps {
   image?: string | null;
   onClick?: (id:Id<'members'>) => void;
   member?: Id<"members">;
+  xl?:boolean;
 }
 
 
-const UserIcon = ({ name, image, onClick = () => {},member }: UserIconProps) => {
+const UserIcon = ({ name, image, onClick = () => {}, member, xl }: UserIconProps) => {
 
   return (
     <Avatar
       onClick={() => onClick(member as Id<'members'>)}
       className="rounded-sm w-full h-full outline-none border-none cursor-pointer select-none"
     >
-      <AvatarFallback className={`${GetProfileBackground(name)} text-white text-2xl`}>
+      <AvatarFallback className={`${GetProfileBackground(name)} text-white ${xl ? 'text-8xl' : 'text-2xl'}`}>
         <p>{name.charAt(0).toUpperCase()}</p>
       </AvatarFallback>
       <AvatarImage

@@ -141,7 +141,7 @@ function PanelSideBar() {
   }
 
   return (
-    <div className="flex flex-col w-full h-full bg-slate-600">
+    <div className="flex flex-col w-full h-full bg-slate-600 ">
       <PanelSideBarHeader member={Member} workspace={Workspace} />
       <PanelItemSection>
         <PanelItem icon={MessageSquareText} label="Threads" />

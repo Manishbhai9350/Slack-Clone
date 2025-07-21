@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useUpdateMessage } from "@/features/messages/api/useUpdateMessage";
 import ChatInput from "@/app/workspaces/_components/ChatInput";
 import MessageList from "@/components/MessageList";
+import { useMemberProfileId } from "@/features/member/store/useParentId";
 
 interface ConversationPageProps {
   id: Id<"conversations">;
@@ -23,6 +24,8 @@ const ConversationPage = ({ id }: ConversationPageProps) => {
   });   
   const OtherMemberId = useGetOtherMemberId();
   const { Data: OtherMember } = useGetMember({ id: OtherMemberId });
+
+  const [_,setProfileId] = useMemberProfileId()
 
   const [IsEdit, setIsEdit] = useState<Id<"messages"> | null>(null);
   const [EditValue, setEditValue] = useState<string>("");
@@ -79,6 +82,7 @@ const ConversationPage = ({ id }: ConversationPageProps) => {
       <Header
         memberImage={OtherMember?.user?.image}
         name={OtherMember?.user?.name}
+        onClick={() => setProfileId(OtherMember!._id)}
       />
       <MessageList
         messages={messages}

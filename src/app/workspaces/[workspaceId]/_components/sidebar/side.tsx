@@ -6,7 +6,7 @@ import SidebarDropDown from './SidebarDropdown'
 
 const WorkspaceSidebar = () => {
   return (
-    <aside className='w-[80px] h-full overflow-y-scroll gap-y-4 flex flex-col justify-start items-center pt-2 bg-slate-700 text-white'>
+    <aside className='w-[80px] h-full overflow-y-hidden gap-y-4 flex flex-col justify-start items-center pt-2 bg-slate-700 text-white'>
         <SidebarDropDown />
         <SidebarButton text='Home' icon={Home} isActive />
         <SidebarButton text='DMs' icon={MessageSquare} />

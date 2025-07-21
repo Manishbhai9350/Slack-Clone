@@ -7,14 +7,14 @@ import { useGetCurrentMember } from "../api/useGetCurrentMember";
 import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { GetProfileBackground } from "@/lib/utils";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useUpdateMember } from "../api/useUpdateMember";
 import { toast } from "sonner";
 import UseConfirm from "@/components/hooks/useConfirm";
 import { useRemoveMember } from "../api/useRemoveMember";
 import UserIcon from "@/components/UserAvatar";
+
+
 
 interface ProfileProps {
     onCancel:() => void;
@@ -127,8 +127,9 @@ const Profile = ({
       </div>
       <div className="w-full mt-5 px-2 flex flex-col gap-2">
         <div className="h-[256px] w-[256px] mx-auto">
-          <UserIcon name={Profile?.user?.name || ''} image={Profile?.user?.image} />
+          <UserIcon xl name={Profile?.user?.name || ''} image={Profile?.user?.image} />
         </div>
+      <h1 className="text-3xl px-4 text-center font-semibold my-2">{Profile?.user?.name}</h1>
         {
           (CurrentMember && Profile && CurrentMember.role == 'admin' && Profile.role == 'member' && Profile._id !== CurrentMember._id) ? (
           <div className="flex mt-6 gap-1">
