@@ -13,7 +13,7 @@ import UseConfirm from "@/components/hooks/useConfirm";
 import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId";
 import { Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Dispatch, FormEvent, ReactNode, SetStateAction, useState } from "react";
+import  { type Dispatch, type FormEvent, type ReactNode, type SetStateAction, useState } from "react";
 import { toast } from "sonner";
 
 interface PrefrencesDialogProps {
