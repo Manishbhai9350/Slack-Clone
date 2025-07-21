@@ -1,13 +1,21 @@
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
-import { useMemo } from "react";
 import { Id } from "../../../../convex/_generated/dataModel";
 
 interface GetWorkspaceProps {
   workspaceId: Id<"workspaces">;
 }
 
-export const useGetWorkspaceInfo = ({ workspaceId }: GetWorkspaceProps) => {
+interface workspaceStruct {
+  Data:{
+    name:string;
+    isMember:boolean;
+  } | null;
+  IsLoading:boolean;
+}
+
+
+export const useGetWorkspaceInfo = ({ workspaceId }: GetWorkspaceProps) : workspaceStruct => {
   try {
     const Data = useQuery(api.workspaces.getInfo, { workspaceId });
 
@@ -19,6 +27,6 @@ export const useGetWorkspaceInfo = ({ workspaceId }: GetWorkspaceProps) => {
 
     return { Data, IsLoading };
   } catch (error) {
-    return { Data: null, IsLoading: false };
+    return { Data: null, IsLoading: false,error};
   }
 };

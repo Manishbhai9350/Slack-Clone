@@ -38,7 +38,7 @@ export const create = mutation({
 
 export const get = query({
   args: {},
-  handler: async (ctx, args) => {
+  handler: async (ctx) => {
     const UserId = await getAuthUserId(ctx);
     if (!UserId) {
       return [];
@@ -81,8 +81,10 @@ export const getInfo = query({
     const Workspace = await ctx.db.get(args.workspaceId)
     const CurrentMember = await ctx.db.query('members').withIndex('by_user_workspace',e => e.eq('user',UserId).eq('workspace',args.workspaceId)).unique()
 
+    if(!Workspace || !CurrentMember) return null;
+
     return {
-      name:Workspace?.name,
+      name:Workspace.name,
       isMember:!!CurrentMember
     };
   },

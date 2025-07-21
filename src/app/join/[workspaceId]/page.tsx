@@ -22,7 +22,7 @@ const JoinPage = () => {
 
   const {mutate:Join,IsPending} = useJoinWorkspace()
 
-  const IsMember = useMemo(() => Data?.isMember,[Data])
+  const IsMember = useMemo(() => Data!.isMember,[Data])
 
   useEffect(() => {
     if(IsMember){
