@@ -28,10 +28,12 @@ const EmojiPopover = ({
 }: EmojiPopoverProps) => {
 
   const [open,setOpen] = useState(false)
-  const TimeOutID = useRef<null | NodeJS.Timeout>(null)
+  const TimeOutID = useRef<NodeJS.Timeout | null>(null)
 
   function onSelect(data:EmojiClickData){
-    clearTimeout(TimeOutID.current)
+    if(TimeOutID.current) {
+      clearTimeout(TimeOutID.current)
+    }
 
     onEmojiSelect(data.emoji)
 

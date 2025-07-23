@@ -194,7 +194,11 @@ export const get = query({
   handler: async (ctx, args) => {
     const UserId = await getAuthUserId(ctx);
     if (!UserId) {
-      return null;
+      return {
+        page: [],
+        isDone: true,
+        continueCursor: "",
+      };
     }
 
     let _conversation = args?.conversation;
@@ -203,7 +207,11 @@ export const get = query({
       const parentMessage = await ctx.db.get(args.parent);
 
       if (!parentMessage) {
-        return null;
+        return {
+          page: [],
+          isDone: true,
+          continueCursor: "",
+        };
       }
 
       _conversation = parentMessage.conversation;

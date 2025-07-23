@@ -35,15 +35,10 @@ const Thread = ({ message, onCancel }: ThreadProps) => {
     id: message,
   });
 
-  console.log(CurrentMessage,IsCurrentMessageLoading)
-
   const {
     messages: Threads,
     isLoading: IsMessagesLoading,
-  } = useGetMessages({ channel: ChannelId, parent: parentId });
-
-  console.log(Threads)
-
+  } = useGetMessages({ channel: ChannelId, parent: parentId as Id<"messages"> | null });
 
   const { mutate: CreateThread, IsPending: IsCreatingThread } =
     useCreateMessage();
@@ -60,7 +55,7 @@ const Thread = ({ message, onCancel }: ThreadProps) => {
 
   function onUpdateCancel() {}
 
-  function HandleSubmit(Value: Delta, ImageInp: HTMLInputElement) {
+  function HandleSubmit(Value: Delta, ImageInp: HTMLInputElement | null) {
     if (!InnerRef.current) return;
 
     const Message = JSON.stringify(Value);
@@ -76,11 +71,13 @@ const Thread = ({ message, onCancel }: ThreadProps) => {
           onSuccess() {
             toast.success("Thread Updated Successfully");
             setIsEdit(null);
-            ImageInp.value = null;
+            if (ImageInp) {
+              ImageInp.value = '';
+            }
             setForceRenderCount((prev) => prev + 1);
           },
           onError() {
-            toast.success("Failed To Update Thread");
+            toast.error("Failed To Update Thread");
           },
           throwError: true,
         }
@@ -94,16 +91,18 @@ const Thread = ({ message, onCancel }: ThreadProps) => {
         workspace: workspaceId,
         message: Message,
         channel: ChannelId,
-        parent: parentId,
+        parent: parentId as Id<"messages"> | undefined,
       },
       {
         onSuccess() {
           toast.success("Reply Added");
-          ImageInp.value = null;
+          if (ImageInp) {
+            ImageInp.value = '';
+          }
           setForceRenderCount((prev) => prev + 1);
         },
         onError() {
-          toast.success("Failed To Add Reply");
+          toast.error("Failed To Add Reply");
         },
         throwError: true,
       }
@@ -126,34 +125,39 @@ const Thread = ({ message, onCancel }: ThreadProps) => {
       </div>
       {CurrentMessage && (
         <Message
-          id={CurrentMessage!._id}
+          id={CurrentMessage._id}
+          member={CurrentMessage.member._id}
           IsCreating={IsCreating}
           setIsCreating={setIsCreating}
           setEditValue={setEditValue}
           isEdit={IsEdit}
           setEdit={setIsEdit}
-          isAuthor={CurrentMessage?.member?._id == CurrentMember?._id}
-          image={CurrentMessage.image || ""}
+          isAuthor={CurrentMessage?.member?._id === CurrentMember?._id}
+          image={CurrentMessage.image || undefined}
           creationTime={CurrentMessage._creationTime}
           isCompact={false}
           authorName={CurrentMessage?.user?.name || ""}
           authorImage={CurrentMessage?.user?.image || ""}
           key={CurrentMessage._creationTime}
           content={CurrentMessage.message}
-          updated={CurrentMessage?.updated || null}
+          updated={CurrentMessage?.updated}
           reactions={CurrentMessage.reactions || []}
+          threadCount={0}
+          threadImage={null}
+          threadTimestamp={0}
+          threadName=""
+          threadMember={CurrentMessage.member._id}
           isThread={true}
-
         />
       )}
       
       <MessageList
         messages={Threads}
         variant="threads"
-        parent={CurrentMessage._id}
+        parent={CurrentMessage?._id}
         setIsEdit={setIsEdit}
         setEditValue={setEditValue}
-        isEdit={IsEdit}
+        IsEdit={IsEdit}
       />
       <div className="w-full pb-2 px-2 h-fit flex justify-center">
         <Editor

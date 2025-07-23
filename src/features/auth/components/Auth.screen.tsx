@@ -8,7 +8,7 @@ import { useWorkspaceAtom } from '@/features/workspace/hooks/useWorkSpace';
 
 const AuthScreen = () => {
     const [Form, setForm] = useState<AuthType>('signin')
-    const [_,setOpen] = useWorkspaceAtom()
+    const [,setOpen] = useWorkspaceAtom()
     useEffect(() => {
       setOpen(false)
       return () => {

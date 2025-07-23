@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useGetChannelId } from "@/features/channels/hooks/useChannelId";
 import { useCreateMessage } from "@/features/messages/api/useCreateMessage";
 import { useGenerateUploadUrl } from "@/features/upload/api/useGenerateUploadUrl";
@@ -24,6 +23,17 @@ interface ChatInputProps {
 }
 
 
+interface mutateValues {
+  message:string;
+  workspace:Id<'workspaces'>,
+  channel?:Id<'channels'>,
+  parent?:Id<'messages'>,
+  image?:Id<'_storage'>,
+  conversation?:Id<'conversations'>,
+}
+
+
+
 const ChatInput = ({isEdit,editValue,onUpdate,onUpdateCancel,updatePending,IsCreating,setIsCreating,conversation}:ChatInputProps) => {
   const workspaceId = useGetWorkspaceId();
   const channelId = useGetChannelId();
@@ -37,26 +47,28 @@ const ChatInput = ({isEdit,editValue,onUpdate,onUpdateCancel,updatePending,IsCre
   const { mutate: GenerateUploadUrl, IsPending: IsGeneratingUploadUrl } =
     useGenerateUploadUrl();
 
-  async function HandleSubmit(value: Delta, ImageInput: HTMLInputElement) {
-    if (IsCreating || !InnerRef.current || (!value && !image)) return;
+  async function HandleSubmit(value: Delta, ImageInput: HTMLInputElement | null) {
+    if (IsCreating || !InnerRef.current || (!value && !ImageInput?.files?.length)) return;
 
     if(isEdit) {
       onUpdate(JSON.stringify(value))
       return;
     }
 
-    const image = ImageInput?.files[0];
+    let image;
+    if(ImageInput && ImageInput.files && ImageInput.files.length ){
+      image = ImageInput?.files[0]
+    }
 
     setDisabled(true);
     setIsCreating(true)
 
     const StringValue = JSON.stringify(value);
 
-    const Values = {
+    const Values:mutateValues = {
       message: StringValue,
       workspace: workspaceId,
       channel: channelId,
-      image: null,
       conversation
     };
 
@@ -74,8 +86,8 @@ const ChatInput = ({isEdit,editValue,onUpdate,onUpdateCancel,updatePending,IsCre
 
           const { storageId } = await result.json();
           Values.image = storageId;
-        } catch (error) {
-          Values.image = null;
+        } catch {
+          // Handle upload error silently
         }
       }
     }
@@ -87,9 +99,11 @@ const ChatInput = ({isEdit,editValue,onUpdate,onUpdateCancel,updatePending,IsCre
       onError() {
         toast.success("Failed To Send Message");
       },
-      onSetteled() {
+      onSettled() {
         setDisabled(false);
-        ImageInput.value = null;
+        if(ImageInput){
+          ImageInput.value = '';
+        }
         setForceRenderCount((prev) => prev + 1);
         setIsCreating(false)
       },

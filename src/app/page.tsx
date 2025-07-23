@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 
 export default function Home() {
   const { Data} = useWorkspaces();
-  const [_, setOpen] = useWorkspaceAtom();
+  const [, setOpen] = useWorkspaceAtom();
 
   const router = useRouter()
 

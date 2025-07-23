@@ -6,7 +6,7 @@ import { Id } from "../../../../convex/_generated/dataModel";
 interface mutateOptions {
   onSuccess?: (Response:Id<'reactions'>) => void;
   onError?: (error:Error) => void;
-  onSetteled?: () => void;
+  onSettled?: () => void;
   throwError?:boolean;
 }
 
@@ -15,7 +15,7 @@ interface mutateValues {
   messageId:Id<'messages'>
 }
 
-type stateTypes = "pending" | "success" | "error" | "setteled" | "";
+type stateTypes = "pending" | "success" | "error" | "settled" | "";
 
 export const useMessageReaction = () => {
   const mutation = useMutation(api.reactions.toggle);
@@ -23,10 +23,10 @@ export const useMessageReaction = () => {
   const [Data, setData] = useState<Id<'reactions'> | null>(null)
   const [state, setState] = useState<stateTypes>("");
 
-  const IsPending = useMemo(() => state == 'pending',[state])
-  const IsSuccess = useMemo(() => state == 'success',[state])
-  const IsError = useMemo(() => state == 'error',[state])
-  const IsSetteled = useMemo(() => state == 'setteled',[state])
+  const IsPending = useMemo(() => state === 'pending',[state])
+  const IsSuccess = useMemo(() => state === 'success',[state])
+  const IsError = useMemo(() => state === 'error',[state])
+  const IsSettled = useMemo(() => state === 'settled',[state])
 
 
   const mutate = useCallback(
@@ -45,12 +45,12 @@ export const useMessageReaction = () => {
             options?.onError?.(e as Error)
         }
       } finally {
-        setState('setteled')
-        options?.onSetteled?.()
+        setState('settled')
+        options?.onSettled?.()
       }
     },
     [mutation]
   );
 
-  return { state, mutate, Data, IsPending, IsError, IsSuccess, IsSetteled };
+  return { state, mutate, Data, IsPending, IsError, IsSuccess, IsSettled };
 };

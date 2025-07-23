@@ -68,7 +68,7 @@ const ChannelPage = () => {
         variant="messages"
         setIsEdit={setIsEdit}
         setEditValue={setEditValue}
-        isEdit={IsEdit}
+        IsEdit={IsEdit}
       />
       <ChatInput
         IsCreating={IsCreating}

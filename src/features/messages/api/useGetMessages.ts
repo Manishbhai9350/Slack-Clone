@@ -17,7 +17,11 @@ export const useGetMessages = ({
 }: GetWorkspaceProps) => {
   const { results, loadMore, status } = usePaginatedQuery(
     api.messages.get,
-    { channel, conversation, parent },
+    {
+      channel,
+      conversation,
+      parent: parent || undefined
+    },
     { initialNumItems: INITIAL_SIZE }
   );
 

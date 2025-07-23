@@ -89,7 +89,6 @@ const MessageList = ({ variant, conversation, parent, setIsEdit, IsEdit, setEdit
                         new Date(msg._creationTime),
                         new Date(PrevMessage._creationTime)
                       ) < 20;
-                      console.log(msg.threadMember)
                     return (
                       <Message
                         id={msg._id}
@@ -99,7 +98,7 @@ const MessageList = ({ variant, conversation, parent, setIsEdit, IsEdit, setEdit
                         isEdit={IsEdit}
                         setEdit={setIsEdit}
                         isAuthor={msg?.member?._id == CurrentMember?._id}
-                        image={msg.image}
+                        image={msg.image || ''}
                         creationTime={msg._creationTime}
                         isCompact={isCompact}
                         authorName={msg?.user?.name}

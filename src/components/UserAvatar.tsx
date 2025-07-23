@@ -7,7 +7,7 @@ interface UserIconProps {
   name: string;
   image?: string | null;
   onClick?: (id:Id<'members'>) => void;
-  member?: Id<"members">;
+  member?: string | Id<"members">;
   xl?:boolean;
 }
 
@@ -16,7 +16,11 @@ const UserIcon = ({ name, image, onClick = () => {}, member, xl }: UserIconProps
 
   return (
     <Avatar
-      onClick={() => onClick(member as Id<'members'>)}
+      onClick={() => {
+        if (member && typeof member !== 'string') {
+          onClick(member);
+        }
+      }}
       className="rounded-sm w-full h-full outline-none border-none cursor-pointer select-none"
     >
       <AvatarFallback className={`${GetProfileBackground(name)} text-white ${xl ? 'text-8xl' : 'text-2xl'}`}>
@@ -25,7 +29,7 @@ const UserIcon = ({ name, image, onClick = () => {}, member, xl }: UserIconProps
       <AvatarImage
         className="outline-none h-full w-full border-none select-none"
         alt="Avatar"
-        src={image}
+        src={image || ''}
       />
     </Avatar>
   );

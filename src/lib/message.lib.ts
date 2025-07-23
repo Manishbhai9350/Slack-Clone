@@ -19,14 +19,14 @@ export type MessageType = {
   member:Doc<'members'>;
   user:Doc<'users'>;
   reactions:ReactionsWithoutMembers;
-  updated:number | null;
+  updated?:number;
   message:string;
-  image:string | undefined;
+  image:string | null | undefined;
   threadCount: number;
   threadImage: string | null;
   threadTimestamp: number;
   threadName?:string;
-  threadMember:Id<'members'>;
+  threadMember:string | Id<'members'>;
 };
 
 type GroupedMessages = {

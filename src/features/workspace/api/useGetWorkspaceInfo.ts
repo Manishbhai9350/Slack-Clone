@@ -21,12 +21,17 @@ export const useGetWorkspaceInfo = ({ workspaceId }: GetWorkspaceProps) : worksp
 
     let IsLoading;
 
-    if (typeof Data == "undefined") {
+    if (typeof Data === "undefined") {
       IsLoading = true;
-    } else IsLoading = false;
+    } else {
+      IsLoading = false;
+    }
 
-    return { Data, IsLoading };
-  } catch (error) {
-    return { Data: null, IsLoading: false,error};
+    // Handle the case where backend returns [] for unauthorized users
+    const normalizedData = Array.isArray(Data) ? null : (Data || null);
+
+    return { Data: normalizedData, IsLoading };
+  } catch {
+    return { Data: null, IsLoading: false };
   }
 };

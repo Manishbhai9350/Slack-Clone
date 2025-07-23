@@ -10,14 +10,12 @@ import { useWorkspaces } from "@/features/workspace/api/useWorkspaces";
 import { useGetWorkspaceId } from "@/features/workspace/hooks/useGetWorkspaceId";
 import { useWorkspaceAtom } from "@/features/workspace/hooks/useWorkSpace";
 
-
-
-import { Loader, Plus } from "lucide-react";
+import { Loader, Plus, TriangleAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo } from "react";
 
 const SidebarDropDown = () => {
-  const [_, setOpen] = useWorkspaceAtom();
+  const [, setOpen] = useWorkspaceAtom();
   const workspaceId = useGetWorkspaceId();
 
   const router = useRouter();
@@ -82,7 +80,7 @@ const SidebarDropDown = () => {
           </div>
         )}
         <DropdownMenuItem
-          onClick={(e) => HandleCreateWorkspace(e)}
+          onClick={() => HandleCreateWorkspace()}
           className="cursor-pointer"
         >
           <Plus className="size-10" />

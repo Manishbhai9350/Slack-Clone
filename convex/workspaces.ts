@@ -75,13 +75,13 @@ export const getInfo = query({
   handler: async (ctx, args) => {
     const UserId = await getAuthUserId(ctx);
     if (!UserId) {
-      return [];
+      return null;
     }
 
     const Workspace = await ctx.db.get(args.workspaceId)
     const CurrentMember = await ctx.db.query('members').withIndex('by_user_workspace',e => e.eq('user',UserId).eq('workspace',args.workspaceId)).unique()
 
-    if(!Workspace || !CurrentMember) return null;
+    if(!Workspace) return null;
 
     return {
       name:Workspace.name,

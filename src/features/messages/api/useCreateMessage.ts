@@ -4,9 +4,9 @@ import { useCallback, useMemo, useState } from "react";
 import { Id } from "../../../../convex/_generated/dataModel";
 
 interface mutateOptions {
-  onSuccess?: (Response:Id<'messages'>) => void;
+  onSuccess?: (Response:Id<'messages'> | null) => void;
   onError?: (error:Error) => void;
-  onSetteled?: () => void;
+  onSettled?: () => void;
   throwError?:boolean;
 }
 
@@ -19,7 +19,7 @@ interface mutateValues {
   conversation?:Id<'conversations'>,
 }
 
-type stateTypes = "pending" | "success" | "error" | "setteled" | "";
+type stateTypes = "pending" | "success" | "error" | "settled" | "";
 
 export const useCreateMessage = () => {
   const mutation = useMutation(api.messages.create);
@@ -27,10 +27,10 @@ export const useCreateMessage = () => {
   const [Data, setData] = useState<Id<'messages'> | null>(null)
   const [state, setState] = useState<stateTypes>("");
 
-  const IsPending = useMemo(() => state == 'pending',[state])
-  const IsSuccess = useMemo(() => state == 'success',[state])
-  const IsError = useMemo(() => state == 'error',[state])
-  const IsSetteled = useMemo(() => state == 'setteled',[state])
+  const IsPending = useMemo(() => state === 'pending',[state])
+  const IsSuccess = useMemo(() => state === 'success',[state])
+  const IsError = useMemo(() => state === 'error',[state])
+  const IsSettled = useMemo(() => state === 'settled',[state])
 
 
   const mutate = useCallback(
@@ -49,12 +49,12 @@ export const useCreateMessage = () => {
             options?.onError?.(e as Error)
         }
       } finally {
-        setState('setteled')
-        options?.onSetteled?.()
+        setState('settled')
+        options?.onSettled?.()
       }
     },
     [mutation]
   );
 
-  return { state, mutate, Data, IsPending, IsError, IsSuccess, IsSetteled };
+  return { state, mutate, Data, IsPending, IsError, IsSuccess, IsSettled };
 };

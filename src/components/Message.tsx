@@ -18,7 +18,7 @@ const Renderer = dynamic(() => import("./Renderer"));
 
 interface MessageProps {
   id: Id<"messages">;
-  member: Id<"members">;
+  member?: Id<"members">;
   isEdit: null | Id<"messages">;
   setEditValue: Dispatch<SetStateAction<string>>;
   setEdit: Dispatch<SetStateAction<Id<"messages"> | null>>;
@@ -28,17 +28,17 @@ interface MessageProps {
   content: string; // Pass Quill Delta
   isAuthor: boolean;
   isCompact: boolean;
-  image: string | undefined;
+  image: string | null | undefined;
   authorName: string | undefined;
   authorImage: string | null;
   creationTime: number;
-  updated: number | null;
+  updated?: number;
   reactions: ReactionsWithoutMembers | [];
-  threadCount: number;
-  threadImage: string | null;
-  threadTimestamp: number;
+  threadCount?: number;
+  threadImage?: string | null;
+  threadTimestamp?: number;
   threadName?: string;
-  threadMember?:Id<'members'>
+  threadMember?:string | Id<'members'>
 }
 
 const FormatFullTime = (date: Date) =>
@@ -69,8 +69,8 @@ const Message = ({
 }: MessageProps) => {
   const { mutate: AddReaction, IsPending: IsReacting } = useMessageReaction();
 
-  const [_,setParentId] = useParentId()
-  const [__, setProfileId] = useMemberProfileId();
+  const [,setParentId] = useParentId()
+  const [, setProfileId] = useMemberProfileId();
 
 
   function OnThreadBarClick(){
@@ -79,7 +79,6 @@ const Message = ({
   }
   
   function OnProfileIconClick(id:Id<'members'>){
-    console.log(id)
     if(!id) return;
     setProfileId(id)
     setParentId(null)
@@ -138,7 +137,7 @@ const Message = ({
               name={threadName}
               onClick={OnThreadBarClick}
               onProfileClick={OnProfileIconClick}
-              member={threadMember}
+              member={threadMember!}
             />
           </div>
         </div>
@@ -173,7 +172,7 @@ const Message = ({
               timestamp={threadTimestamp}
               name={threadName}
               onClick={OnThreadBarClick}
-              member={threadMember}
+              member={threadMember!}
               onProfileClick={OnProfileIconClick}
             />
         </div>

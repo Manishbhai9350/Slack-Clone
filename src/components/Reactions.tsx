@@ -23,6 +23,10 @@ const Reactions = ({ reactions, onChange }: ReactionsProps) => {
 
   if (!reactions || reactions.length == 0) return null;
 
+  if(!CurrentMember) {
+    return null;
+  }
+
   return (
     <div className="flex flex-wrap justify-start items-start gap-2">
       {reactions &&

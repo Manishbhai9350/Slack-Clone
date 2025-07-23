@@ -4,13 +4,13 @@ import UserIcon from "./UserAvatar";
 import { Id } from "../../convex/_generated/dataModel";
 
 interface ThreadBarProps {
-  member:Id<'members'>,
+  member:string | Id<'members'>,
   count?: number;
   image?: string | null;
   timestamp?: number;
   name?: string;
   onClick: () => void;
-  onProfileClick?: () => void;
+  onProfileClick?: (id:Id<'members'>) => void;
 }
 
 
@@ -21,7 +21,7 @@ const ThreadBar = ({
   name = "Member",
   timestamp = 0,
   onClick,
-  onProfileClick
+  onProfileClick = () => {}
 }: ThreadBarProps) => {
   if (!count || !name) return null;
   return (
@@ -29,7 +29,12 @@ const ThreadBar = ({
       className="bg-white w-[600px]  cursor-pointer rounded-sm p-1 flex justify-start items-center gap-2 group/thread-bar"
     >
       <div className="w-10 aspect-square">
-        <UserIcon onClick={onProfileClick} member={member} name={name || ""} image={image} />
+        <UserIcon
+          onClick={(id) => onProfileClick?.(id)}
+          member={member}
+          name={name || ""}
+          image={image}
+        />
       </div>
 
       

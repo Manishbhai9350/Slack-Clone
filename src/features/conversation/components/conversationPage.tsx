@@ -25,7 +25,7 @@ const ConversationPage = ({ id }: ConversationPageProps) => {
   const OtherMemberId = useGetOtherMemberId();
   const { Data: OtherMember } = useGetMember({ id: OtherMemberId });
 
-  const [_,setProfileId] = useMemberProfileId()
+  const [,setProfileId] = useMemberProfileId()
 
   const [IsEdit, setIsEdit] = useState<Id<"messages"> | null>(null);
   const [EditValue, setEditValue] = useState<string>("");
@@ -72,7 +72,7 @@ const ConversationPage = ({ id }: ConversationPageProps) => {
     return (
       <div className="w-full h-full flex flex-col space-y-3 justify-center items-center">
         <AlertTriangle className="size-6" />
-        <p>Unable To Find Workspace</p>
+        <p>Unable To Find Conversation</p>
       </div>
     );
   }
@@ -89,7 +89,7 @@ const ConversationPage = ({ id }: ConversationPageProps) => {
         variant="conversation"
         setIsEdit={setIsEdit}
         setEditValue={setEditValue}
-        isEdit={IsEdit}
+        IsEdit={IsEdit}
         conversation={id}
       />
       <ChatInput

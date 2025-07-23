@@ -116,7 +116,7 @@ function PanelSideBar() {
   const workspaceId = useGetWorkspaceId();
 
 
-  const [_, setOpen] = useChannelAtom();
+  const [, setOpen] = useChannelAtom();
 
   const { Data: Workspace, IsLoading: WorkspaceLoading } = useGetWorkSpace({
     workspaceId,
@@ -144,7 +144,7 @@ function PanelSideBar() {
     <div className="flex flex-col w-full h-full bg-slate-600 ">
       <PanelSideBarHeader member={Member} workspace={Workspace} />
       <PanelItemSection>
-        <PanelItem  icon={MessageSquareText} label="Threads" />
+        <PanelItem icon={MessageSquareText} label="Threads" />
         <PanelItem icon={SendHorizonal} label="Drafts & Sent" />
       </PanelItemSection>
       <PanelItemSection
@@ -192,8 +192,8 @@ function PanelSideBar() {
             <PanelMemberItem
               key={Item._id}
               isActive={Item._id == OtherMemberId}
-              name={Item.User?.name}
-              image={Item.User?.image}
+              name={Item?.User?.name || ''}
+              image={Item?.User?.image || ''}
               id={Item._id}
             />
           ))}

@@ -63,7 +63,7 @@ function Header({name}:HeaderProps) {
             <DialogTitle>Prefrences</DialogTitle>
           </DialogHeader>
 
-          <EditChannelName value={name}>
+          <EditChannelName value={name || ''} >
             <div className="w-full cursor-pointer flex justify-between items-center bg-gray-100 rounded-sm p-2">
               <div className="flex flex-col items-start">
                 <p className="text-sm">Workspace Name</p>

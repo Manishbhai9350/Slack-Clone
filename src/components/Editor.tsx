@@ -1,5 +1,5 @@
 import Quill, { Delta, QuillOptions } from "quill";
-import { Ref, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Ref, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { Smile, ImageIcon, XIcon } from "lucide-react";
 import { PiTextAa } from "react-icons/pi";
@@ -15,11 +15,11 @@ import { Id } from "../../convex/_generated/dataModel";
 
 interface EditorProps {
   variant?: "create" | "update";
-  onSubmit: (value: Delta, elem: HTMLInputElement) => void;
+  onSubmit: (value: Delta, elem: HTMLInputElement | null) => void;
   onCancel: () => void;
   placeholder: string;
   disabled: boolean;
-  innerRef: Ref;
+  innerRef: Ref<Quill>;
   isEdit: null | Id<"messages">;
   updateValue: string;
   noControl?: boolean;
@@ -38,58 +38,57 @@ const Editor = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const quillRef = useRef<Quill | null>(null);
 
-  const placeholderRef = useRef<string | null>(null);
-  const onSumbmitRef =
-    useRef<(value: Delta, elem: HTMLInputElement) => void | null>(null);
-  const onCancelRef = useRef<() => void | null>(null);
-  const disabeldRef = useRef<boolean | null>(null);
-  const imageELementRef = useRef<HTMLInputElement | null>(null);
+  const placeholderRef = useRef<string>(placeholder);
+  const onSubmitRef = useRef<(value: Delta, elem: HTMLInputElement | null) => void>(onSubmit);
+  const onCancelRef = useRef<() => void>(onCancel);
+  const disabledRef = useRef<boolean>(disabled);
+  const imageElementRef = useRef<HTMLInputElement | null>(null);
 
-  const [IMG, setIMG] = useState<File | null>(null);
-  const [Value, setValue] = useState("");
-  const [IsToolBarVisible, setIsToolBarVisible] = useState(true);
+  const [img, setImg] = useState<File | null>(null);
+  const [value, setValue] = useState("");
+  const [isToolBarVisible, setIsToolBarVisible] = useState(true);
 
-  function HandleValueChange() {
+  const handleValueChange = useCallback(() => {
     if (!quillRef.current) return;
-    const Text = quillRef.current.getText();
-    setValue(Text);
-  }
+    const text = quillRef.current.getText();
+    setValue(text);
+  }, []);
 
-  function ToggleToolbar() {
+  const toggleToolbar = useCallback(() => {
     if (!containerRef.current) return;
     setIsToolBarVisible((prev) => !prev);
     containerRef.current
       ?.querySelector(".ql-toolbar")
       ?.classList?.toggle("hidden");
-  }
+  }, []);
 
-  function HandleEmojiInput(emoji: string) {
+  const handleEmojiInput = useCallback((emoji: string) => {
     if (!quillRef.current) return;
     quillRef.current.insertText(
       quillRef.current.getSelection()?.index || 0,
       emoji
     );
-  }
+  }, []);
 
   useLayoutEffect(() => {
     placeholderRef.current = placeholder;
-    onSumbmitRef.current = onSubmit;
+    onSubmitRef.current = onSubmit;
     onCancelRef.current = onCancel;
-    disabeldRef.current = disabled;
+    disabledRef.current = disabled;
   });
 
-  function HandleSubmit() {
+  const handleSubmit = useCallback(() => {
     if (!quillRef.current) return;
-    onSumbmitRef?.current?.(
+    onSubmitRef.current(
       quillRef.current.getContents(),
-      imageELementRef.current
+      imageElementRef.current
     );
-  }
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const container = containerRef.current!;
+    const container = containerRef.current;
 
     const editorContainer = container.appendChild(
       container.ownerDocument.createElement("div")
@@ -97,7 +96,7 @@ const Editor = ({
 
     const options: QuillOptions = {
       theme: "snow",
-      placeholder: placeholderRef.current!,
+      placeholder: placeholderRef.current,
       modules: {
         toolbar: [
           ["bold", "italic", "strike"],
@@ -108,7 +107,7 @@ const Editor = ({
           bindings: {
             enter: {
               key: "Enter",
-              handler: HandleSubmit,
+              handler: handleSubmit,
             },
           },
         },
@@ -117,8 +116,15 @@ const Editor = ({
 
     const quill = new Quill(editorContainer, options);
     quillRef.current = quill;
-    innerRef.current = quill;
-    quill.on(Quill.events.TEXT_CHANGE, HandleValueChange);
+
+    // Handle ref assignment properly
+    if (typeof innerRef === 'function') {
+      innerRef(quill);
+    } else if (innerRef && 'current' in innerRef) {
+      (innerRef as React.MutableRefObject<Quill | null>).current = quill;
+    }
+
+    quill.on(Quill.events.TEXT_CHANGE, handleValueChange);
     quill.focus();
 
     return () => {
@@ -130,11 +136,11 @@ const Editor = ({
         quillRef.current = null;
       }
     };
-  }, [innerRef]);
+  }, [innerRef, handleSubmit, handleValueChange]);
 
   useEffect(() => {
     if (disabled) {
-      quillRef.current?.disable(true);
+      quillRef.current?.disable();
     } else {
       quillRef.current?.enable(true);
     }
@@ -142,39 +148,39 @@ const Editor = ({
   }, [disabled]);
 
   useEffect(() => {
-    if (variant == "update") {
+    if (variant === "update") {
       quillRef.current?.setContents(JSON.parse(updateValue));
       quillRef.current?.focus();
       return;
     }
-    quillRef.current?.setContents(null);
+    quillRef.current?.setContents([]);
   }, [updateValue, variant]);
 
-  const ValueEmpty =
-    !IMG && Value.replace(/<(.|\n)*?>/g, "").trim().length == 0;
+  const valueEmpty =
+    !img && value.replace(/<(.|\n)*?>/g, "").trim().length === 0;
 
   return (
     <div className="flex flex-col w-full">
       <input
-        ref={imageELementRef}
+        ref={imageElementRef}
         type="file"
         accept="image/*"
         className="hidden"
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file) {
-            setIMG(file);
+            setImg(file);
           }
         }}
       />
 
       <div className="flex flex-col border-slate-200 rounded-md overflow-hidden focus-within:border-slate-300 focus-within:shadow-sm transition bg-white">
         <div ref={containerRef} className="h-full ql-custom" />
-        {IMG && (
+        {img && (
           <div className="image-element p-2">
             <div className="size-16 rounded-sm overflow-hidden relative group">
               <Image
-                src={URL.createObjectURL(IMG)}
+                src={URL.createObjectURL(img)}
                 alt="Selected Image"
                 fill
                 className="object-cover"
@@ -182,7 +188,7 @@ const Editor = ({
               <div
                 onClick={() => {
                   if (disabled) return;
-                  setIMG(null);
+                  setImg(null);
                 }}
                 className="absolute top-1 right-1 w-5 h-5 bg-black text-white rounded-full leading-none text-center opacity-0 group-hover:opacity-100 transition flex justify-center items-center cursor-pointer"
               >
@@ -193,50 +199,50 @@ const Editor = ({
         )}
         <div className="tools flex p-2 z-[5]">
           <Hint
-            label={IsToolBarVisible ? "Hide-Formatting" : "Show-Formatting"}
+            label={isToolBarVisible ? "Hide-Formatting" : "Show-Formatting"}
           >
-            <Button onClick={ToggleToolbar} variant="ghost">
+            <Button onClick={toggleToolbar} variant="ghost">
               <PiTextAa className="size-4" />
             </Button>
           </Hint>
-          <EmojiPopover onEmojiSelect={HandleEmojiInput} label="Emoji">
+          <EmojiPopover onEmojiSelect={handleEmojiInput} label="Emoji">
             <Button variant="ghost">
               <Smile className="size-4" />
             </Button>
           </EmojiPopover>
-          {variant == "create" && !noControl && (
+          {variant === "create" && !noControl && (
             <Hint label="Image">
               <Button
-                onClick={() => imageELementRef?.current?.click()}
+                onClick={() => imageElementRef?.current?.click()}
                 variant="ghost"
               >
                 <ImageIcon className="size-4" />
               </Button>
             </Hint>
           )}
-          {variant == "update" && (
+          {variant === "update" && (
             <div className="ml-auto flex gap-2">
               <Button
-                disabled={disabled || ValueEmpty}
+                disabled={disabled || valueEmpty}
                 onClick={onCancel}
                 variant="outline"
               >
                 Cancel
               </Button>
               <Button
-                disabled={disabled || ValueEmpty}
-                onClick={HandleSubmit}
+                disabled={disabled || valueEmpty}
+                onClick={handleSubmit}
                 className="bg-slate-700 hover:bg-slate-700 transition"
               >
                 Update
               </Button>
             </div>
           )}
-          {variant == "create" && (
+          {variant === "create" && (
             <Hint label="Send">
               <Button
-                onClick={HandleSubmit}
-                disabled={disabled || ValueEmpty}
+                onClick={handleSubmit}
+                disabled={disabled || valueEmpty}
                 className="ml-auto bg-slate-700 hover:bg-slate-700 transition"
               >
                 <MdSend />
@@ -248,7 +254,7 @@ const Editor = ({
       <div
         className={cn(
           "flex justify-end text-[10px] text-muted-foreground p-2 transition",
-          ValueEmpty && "opacity-0"
+          valueEmpty && "opacity-0"
         )}
       >
         <strong>Shift + Enter</strong>&nbsp;to add a new line
