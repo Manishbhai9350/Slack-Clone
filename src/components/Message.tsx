@@ -78,7 +78,7 @@ const Message = ({
     setParentId(id)
   }
   
-  function OnProfileIconClick(id:Id<'members'>){
+  function OnProfileIconClick(id?:Id<'members'>){
     if(!id) return;
     setProfileId(id)
     setParentId(null)
@@ -114,7 +114,7 @@ const Message = ({
     return (
       <div className="p-2 flex items-start gap-2 hover:bg-slate-100 transition relative group overflow-x-hidden">
         <div className="logo-or shrink-0 w-12 aspect-square flex justify-center items-center">
-          <UserIcon member={member} onClick={OnProfileIconClick} name={authorName || ''} image={authorImage} />
+          <UserIcon member={member} onClick={() => OnProfileIconClick(member)} name={authorName || ''} image={authorImage} />
         </div>
         <div className="flex flex-col">
           <div className="name-time flex items-center gap-2">

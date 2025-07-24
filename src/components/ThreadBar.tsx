@@ -30,7 +30,7 @@ const ThreadBar = ({
     >
       <div className="w-10 aspect-square">
         <UserIcon
-          onClick={(id) => onProfileClick?.(id)}
+          onClick={(id) => onProfileClick(id)}
           member={member}
           name={name || ""}
           image={image}
